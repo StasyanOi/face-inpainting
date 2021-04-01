@@ -15,4 +15,4 @@ sudo apt-get install python3-apt
 echo "deb http://repo.yandex.ru/yandex-disk/deb/ stable main" | sudo tee -a /etc/apt/sources.list.d/yandex-disk.list > /dev/null && wget http://repo.yandex.ru/yandex-disk/YANDEX-DISK-KEY.GPG -O- | sudo apt-key add - && sudo apt-get update && sudo apt-get install -y yandex-disk
 
 sudo apt update
-sudo apt install nvidia-cuda-toolkit
+sudo apt-get install software-properties-common
