@@ -127,3 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+venv
+saved_models
+results
+tensorboard
+test_data
+train_data
+CelebA-HQ-img-256-256-labels.zip
+CelebA-HQ-img-256-256-masked.zip
