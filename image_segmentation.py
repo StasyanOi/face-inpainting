@@ -8,7 +8,6 @@ from tensorflow.keras.optimizers import Adam
 
 
 class SaveModelCallback(tensorflow.keras.callbacks.Callback):
-
     def on_epoch_begin(self, epoch, logs=None):
         self.model.save("saved_models/unet_segment")
 
