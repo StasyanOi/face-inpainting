@@ -23,3 +23,4 @@ chmod +x Anaconda3-2020.07-Linux-x86_64.sh
 conda create --name tf_gpu
 conda activate tf_gpu
 conda install tensorflow-gpu
+conda install scikit-learn

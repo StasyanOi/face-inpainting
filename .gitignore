@@ -129,7 +129,7 @@ dmypy.json
 .pyre/
 venv
 saved_models
-results
+results_inpaint_unet
 tensorboard
 test_data
 train_data
@@ -137,3 +137,8 @@ CelebA-HQ-img-256-256-labels.zip
 CelebA-HQ-img-256-256-masked.zip
 *.iml
 .idea
+inpaint_unet_new_mask
+results_real
+results
+test_real
+unet_seg
