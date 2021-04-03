@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import PIL.Image as Image
 import os
 
+
 def sort_names(dir):
     ints = []
     for i in range(len(dir)):
@@ -12,6 +13,7 @@ def sort_names(dir):
     for i in range(len(dir)):
         dir[i] = str(ints[i]) + ".png"
     return dir
+
 
 def load_face_pictures(dir, img_num=1000, color_mode='grayscale'):
     # dataset = preprocessing.image_dataset_from_directory('dataset', color_mode='grayscale', image_size=(512, 512))
@@ -26,7 +28,23 @@ def load_face_pictures(dir, img_num=1000, color_mode='grayscale'):
         images.append(input_arr_feature)
 
     batch_feature = np.array(images)  # Convert single image to a batch.
-    return batch_feature
+    return batch_feature, dir_list
+
+
+def load_face_pictures_batch(dir, start, end, color_mode='grayscale'):
+    # dataset = preprocessing.image_dataset_from_directory('dataset', color_mode='grayscale', image_size=(512, 512))
+    dir_list = sort_names(os.listdir(dir))
+    dir_list = dir_list[start:end]
+
+    images = []
+    for i in range(0, len(dir_list)):
+        feature = tensorflow.keras.preprocessing.image.load_img(dir + "/" + dir_list[i],
+                                                                color_mode=color_mode)
+        input_arr_feature = tensorflow.keras.preprocessing.image.img_to_array(feature)
+        images.append(input_arr_feature)
+
+    batch_feature = np.array(images)  # Convert single image to a batch.
+    return batch_feature, dir_list
 
 
 def apply_mask(features, masks):
@@ -74,5 +92,26 @@ def merge_temp():
     img.save("test_data/faces/face1/merged/merged.png")
 
 
+def merge_feature_mask():
+    masked = "./train_data/medical/CelebA-HQ-img-256-256-masked/"
+    img_labels = "./train_data/medical/CelebA-HQ-img-256-256-labels/"
+    merged = "./train_data/medical/CelebA-HQ-img-256-256-merged/"
+
+    indexes = np.arange(0, 11000, 1000)
+
+    for p in range(len(indexes) - 1):
+        features, f_list = load_face_pictures_batch(masked, indexes[p], indexes[p + 1], color_mode='rgb')
+        labels, l_list = load_face_pictures_batch(img_labels, indexes[p], indexes[p + 1])
+
+        for i in range(len(features)):
+            for j in range(features[i].shape[0]):
+                for k in range(features[i].shape[1]):
+                    if labels[i][j, k] == 255:
+                        features[i][j, k, 0] = 255
+                        features[i][j, k, 1] = 255
+                        features[i][j, k, 2] = 255
+            Image.fromarray(features[i].astype('uint8')).save(merged + f_list[i])
+
+
 if __name__ == '__main__':
-    merge_temp()
+    merge_feature_mask()
