@@ -147,6 +147,7 @@ class DCGAN():
 
             # If at save interval => save generated image samples
             if epoch % save_interval == 0:
+                self.generator.save("saved_models/mnist_generator", save_format="tf")
                 self.save_imgs(epoch)
 
     def save_imgs(self, epoch):
