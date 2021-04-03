@@ -8,20 +8,20 @@ if __name__ == '__main__':
     model.summary()
 
     cap = cv2.VideoCapture(0)
-    i = 10
+    # i = 10
     while 1:
         ret, img = cap.read()
         img = img[:, 79:559, :]
         cv2.imshow('img.png', img)
         img = cv2.resize(img, dsize=(256, 256))
-        cv2.imwrite("test_real/" + str(i) + '.png', img)
+        # cv2.imwrite("test_real/" + str(i) + '.png', img)
         img = img / 255
         predict = model.predict(np.array([img]))
         img = (np.round(predict[0, :, :, 0]) * 255.0).astype("uint8")
 
         # cv2.imwrite('img2.png', img)
         # cv2.imshow('img.png', img)
-        i = i + 1
+        # i = i + 1
         k = cv2.waitKey(30) & 0xff
         if k == 27:
             cv2.imwrite('img.png', img)

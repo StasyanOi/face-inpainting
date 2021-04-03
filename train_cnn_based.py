@@ -17,7 +17,7 @@ def ssim_loss(y_true, y_pred):
 
 if __name__ == '__main__':
     input_layer = Input((128, 128, 3))
-    model = models.build_model(input_layer, 16)
+    model = models.standard_unet(input_layer, 16)
     # model = load_model("inpaint_unet", compile=False)
     model.compile(Adam(), loss=ssim_loss, metrics=[ssim_loss, 'accuracy'])
     model.summary()
