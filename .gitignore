@@ -141,4 +141,4 @@ inpaint_unet_new_mask
 results_real
 results
 test_real
-unet_seg
+saved_models/unet_seg

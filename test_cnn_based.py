@@ -12,7 +12,7 @@ if __name__ == '__main__':
     dir = "test_real"
     features = dataset.load_face_pictures(dir, img_num=100, color_mode='rgb') / 255
 
-    model = load_model("unet_seg", compile=False)
+    model = load_model("saved_models/unet_seg", compile=False)
     model.summary()
     predictions = model.predict(features)
     predictions = np.round(predictions[:, :, :, 0]) * 255.0
