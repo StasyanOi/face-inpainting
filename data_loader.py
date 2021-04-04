@@ -20,7 +20,7 @@ class DataLoader():
         imgs_A = imgs_A / 127.5 - 1.
         imgs_B = imgs_B / 127.5 - 1.
 
-        return imgs_A, imgs_B
+        return imgs_B, imgs_A
 
     # def load_batch(self, batch_size=1, is_testing=False):
     #     imgs_A = np.array(imgs_A) / 127.5 - 1.
