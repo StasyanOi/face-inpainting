@@ -13,9 +13,10 @@ class SaveModelCallback(tensorflow.keras.callbacks.Callback):
 
 
 def get_data(feature_dir, label_dir):
-    features = dataset.load_face_pictures(feature_dir, color_mode="rgb") / 255
-    labels = dataset.load_face_pictures(label_dir, color_mode="grayscale") / 255
-
+    features, _ = dataset.load_face_pictures(feature_dir, color_mode="rgb")
+    labels, _ = dataset.load_face_pictures(label_dir, color_mode="grayscale")
+    features = features / 255
+    labels = labels / 255
     features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size=0.2)
 
     return features_train, features_test, labels_train, labels_test
