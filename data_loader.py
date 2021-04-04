@@ -11,8 +11,8 @@ class DataLoader():
         self.img_res = img_res
 
     def load_data(self):
-        merged = "train_data/medical/CelebA-HQ-img-256-256-merged"
-        masked = "train_data/medical/CelebA-HQ-img-256-256"
+        merged = "medical/CelebA-HQ-img-256-256-merged"
+        masked = "medical/CelebA-HQ-img-256-256"
 
         input, _ = dataset.load_face_pictures_batch(merged, 0, 10, color_mode="rgb")
         potential_output, _ = dataset.load_face_pictures_batch(masked, 0, 10, color_mode="rgb")

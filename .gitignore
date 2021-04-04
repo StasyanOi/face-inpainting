@@ -145,3 +145,4 @@ saved_models/unet_seg
 gan_images
 *.zip
 medical
+*.token
