@@ -143,3 +143,4 @@ results
 test_real
 saved_models/unet_seg
 gan_images
+*.zip
