@@ -11,7 +11,7 @@ from tensorflow.keras.layers import LeakyReLU
 from tensorflow.keras.layers import UpSampling2D, Conv2D
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
-
+import PIL.Image as Image
 from data_loader import DataLoader
 
 
@@ -148,8 +148,8 @@ class Pix2Pix():
         start_time = datetime.datetime.now()
 
         # Adversarial loss ground truths
-        valid = np.ones((100,) + self.disc_patch)
-        fake = np.zeros((100,) + self.disc_patch)
+        valid = np.ones((10,) + self.disc_patch)
+        fake = np.zeros((10,) + self.disc_patch)
 
         for epoch in range(epochs):
             (imgs_A, imgs_B) = self.data_loader.load_data()
@@ -175,38 +175,22 @@ class Pix2Pix():
             elapsed_time = datetime.datetime.now() - start_time
             # Plot the progress
             print("[Epoch %d/%d] [D loss: %f, acc: %3d%%] [G loss: %f] time: %s" % (epoch, epochs,
-                                                                                                  d_loss[0],
-                                                                                                  100 * d_loss[1],
-                                                                                                  g_loss[0],
-                                                                                                  elapsed_time))
+                                                                                    d_loss[0],
+                                                                                    100 * d_loss[1],
+                                                                                    g_loss[0],
+                                                                                    elapsed_time))
 
             # If at save interval => save generated image samples
-            if epoch % sample_interval == 0:
-                self.sample_images(epoch)
+            # if epoch % sample_interval == 0:
+            self.sample_images(epoch)
 
     def sample_images(self, epoch):
-        os.makedirs('images/%s' % self.dataset_name, exist_ok=True)
-        r, c = 3, 3
-
         imgs_A, imgs_B = self.data_loader.load_data()
         fake_A = self.generator.predict(imgs_B)
 
-        gen_imgs = np.concatenate([imgs_B, fake_A, imgs_A])
-
-        # Rescale images 0 - 1
-        gen_imgs = 0.5 * gen_imgs + 0.5
-
-        titles = ['Condition', 'Generated', 'Original']
-        fig, axs = plt.subplots(r, c)
-        cnt = 0
-        for i in range(r):
-            for j in range(c):
-                axs[i, j].imshow(gen_imgs[cnt])
-                axs[i, j].set_title(titles[i])
-                axs[i, j].axis('off')
-                cnt += 1
-        fig.savefig("gan_images/%d.png" % epoch)
-        plt.close()
+        Image.fromarray(((0.5 * imgs_A[0] + 0.5) * 255).astype('uint8')).save("gan_images/real.png")
+        Image.fromarray(((0.5 * imgs_B[0] + 0.5) * 255).astype('uint8')).save("gan_images/input.png")
+        Image.fromarray(((0.5 * fake_A[0] + 0.5) * 255).astype('uint8')).save("gan_images/generated.png")
 
 
 if __name__ == '__main__':
