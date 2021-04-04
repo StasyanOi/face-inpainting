@@ -183,6 +183,7 @@ class Pix2Pix():
             # If at save interval => save generated image samples
             # if epoch % sample_interval == 0:
             self.sample_images(epoch)
+            self.generator.save("saved_models/inpaint_net", save_format="tf")
 
     def sample_images(self, epoch):
         imgs_A, imgs_B = self.data_loader.load_data()
