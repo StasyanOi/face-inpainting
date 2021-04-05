@@ -46,6 +46,18 @@ def load_face_pictures_batch(dir, start, end, color_mode='grayscale'):
     batch_feature = np.array(images)  # Convert single image to a batch.
     return batch_feature, dir_list
 
+def load_face_pictures_list(dir, lst, color_mode='grayscale'):
+    # dataset = preprocessing.image_dataset_from_directory('dataset', color_mode='grayscale', image_size=(512, 512))
+
+    images = []
+    for i in range(0, len(lst)):
+        feature = tensorflow.keras.preprocessing.image.load_img(dir + "/" + lst[i],
+                                                                color_mode=color_mode)
+        input_arr_feature = tensorflow.keras.preprocessing.image.img_to_array(feature)
+        images.append(input_arr_feature)
+
+    batch_feature = np.array(images)  # Convert single image to a batch.
+    return batch_feature, lst
 
 def apply_mask(features, masks):
     for i in range(len(features)):
