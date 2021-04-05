@@ -41,8 +41,8 @@ if __name__ == '__main__':
     predictions = model.predict(features)
     predictions = np.round(predictions[:, :, :, 0]) * 255.0
     for i in range(len(predictions)):
-        predictions[i] = cv2.erode(predictions[i], (3, 3))
-        predictions[i] = cv2.dilate(predictions[i], (15, 15))
+        predictions[i] = cv2.erode(predictions[i], (15, 15))
+        predictions[i] = cv2.dilate(predictions[i], (50, 50))
         cv2.imshow('img.jpg', (predictions[i]).astype("uint8"))
         k = cv2.waitKey(30) & 0xff
         if k == 27:
