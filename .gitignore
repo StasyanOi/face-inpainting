@@ -146,3 +146,5 @@ gan_images
 *.zip
 medical
 *.token
+merged_real
+inpaint_real

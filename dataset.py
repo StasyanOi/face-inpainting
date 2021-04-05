@@ -92,10 +92,12 @@ def merge_temp():
     img.save("test_data/faces/face1/merged/merged.png")
 
 
-def merge_feature_mask():
-    masked = "./train_data/medical/CelebA-HQ-img-256-256-masked/"
-    img_labels = "./train_data/medical/CelebA-HQ-img-256-256-labels/"
-    merged = "./train_data/medical/CelebA-HQ-img-256-256-merged/"
+def merge_feature_mask(masked_people="./train_data/medical/CelebA-HQ-img-256-256-masked",
+                       binary_labels="./train_data/medical/CelebA-HQ-img-256-256-labels",
+                       merged_dir="./train_data/medical/CelebA-HQ-img-256-256-merged"):
+    masked = masked_people + "/"
+    img_labels = binary_labels + "/"
+    merged = merged_dir + "/"
 
     indexes = np.arange(0, 11000, 1000)
 
