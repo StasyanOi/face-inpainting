@@ -14,8 +14,8 @@ class DataLoader():
         merged = "medical/CelebA-HQ-img-256-256-merged"
         masked = "medical/CelebA-HQ-img-256-256"
 
-        input, _ = dataset.load_face_pictures_batch(merged, 0, 10, color_mode="rgb")
-        potential_output, _ = dataset.load_face_pictures_batch(masked, 0, 10, color_mode="rgb")
+        input, _ = dataset.load_face_pictures_batch(merged, 0, 1000, color_mode="rgb")
+        potential_output, _ = dataset.load_face_pictures_batch(masked, 0, 1000, color_mode="rgb")
 
         input = input / 127.5 - 1.
         potential_output = potential_output / 127.5 - 1.
