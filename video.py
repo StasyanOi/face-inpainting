@@ -2,29 +2,62 @@ import cv2.cv2 as cv2
 from tensorflow.keras.models import load_model
 import numpy as np
 import PIL.Image as Image
+import dataset
+import shutil
+import os
 
 if __name__ == '__main__':
-    model = load_model("saved_models/unet_seg", compile=False)
-    model.summary()
+    shutil.rmtree("test_real")
+    shutil.rmtree("results_real")
+    shutil.rmtree("merged_real")
+    shutil.rmtree("inpaint_real")
+    os.mkdir("test_real")
+    os.mkdir("results_real")
+    os.mkdir("merged_real")
+    os.mkdir("inpaint_real")
+    model = load_model("saved_models/segment")
+    inpaint = load_model("saved_models/inpaint_face_gan")
+    # model.summary()
 
     cap = cv2.VideoCapture(0)
-    # i = 10
-    while 1:
+
+    img_number = 100
+    for i in range(img_number):
         ret, img = cap.read()
         img = img[:, 79:559, :]
         cv2.imshow('img.png', img)
         img = cv2.resize(img, dsize=(256, 256))
-        # cv2.imwrite("test_real/" + str(i) + '.png', img)
-        img = img / 255
-        predict = model.predict(np.array([img]))
-        img = (np.round(predict[0, :, :, 0]) * 255.0).astype("uint8")
-
-        # cv2.imwrite('img2.png', img)
-        # cv2.imshow('img.png', img)
-        # i = i + 1
+        cv2.imwrite("test_real/" + str(i) + '.png', img)
         k = cv2.waitKey(30) & 0xff
         if k == 27:
-            cv2.imwrite('img.png', img)
             break
     cap.release()
     cv2.destroyAllWindows()
+
+    masked_face_dir = "test_real"
+    masked_faces, _ = dataset.load_face_pictures(masked_face_dir, img_num=img_number, color_mode='rgb')
+    features = masked_faces / 255
+
+    predictions = model.predict(features)
+    predictions = np.round(predictions[:, :, :, 0]) * 255.0
+    for i in range(len(predictions)):
+        predictions[i] = cv2.morphologyEx(predictions[i], cv2.MORPH_OPEN, (5, 5))
+        cv2.imshow('img.jpg', (predictions[i]).astype("uint8"))
+        k = cv2.waitKey(30) & 0xff
+        if k == 27:
+            break
+        predicted_img = Image.fromarray((predictions[i]).astype("uint8"), "L")
+        predicted_img.save("results_real/" + str(i) + ".png")
+
+    dataset.merge_feature_mask("test_real", "results_real", "merged_real")
+
+    faces_with_no_mask = "merged_real"
+    features, _ = dataset.load_face_pictures(faces_with_no_mask, img_num=img_number, color_mode='rgb')
+    features = features / 127.5 - 1
+    inpaint_real = "inpaint_real"
+    predictions = inpaint.predict(features)
+    for i in range(img_number):
+        predictions[i] = ((0.5 * predictions[i] + 0.5) * 255)
+        cv2.imshow('img.jpg', (predictions[i]).astype("uint8"))
+        predicted_img = Image.fromarray((predictions[i]).astype("uint8"))
+        predicted_img.save(inpaint_real + "/" + str(i) + ".png")

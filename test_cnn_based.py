@@ -10,16 +10,16 @@ if __name__ == '__main__':
 
     # dir = "train_data/medical/CelebA-HQ-img-256-256-masked"
     dir = "test_real"
-    features = dataset.load_face_pictures(dir, img_num=100, color_mode='rgb') / 255
+    features, _ = dataset.load_face_pictures(dir, img_num=100, color_mode='rgb')
+    features = features / 255
 
-    model = load_model("saved_models/unet_seg", compile=False)
-    model.summary()
+    model = load_model("saved_models/segment")
+    # model.summary()
     predictions = model.predict(features)
     predictions = np.round(predictions[:, :, :, 0]) * 255.0
     for i in range(len(predictions)):
+        predictions[i] = cv2.morphologyEx(predictions[i], cv2.MORPH_OPEN, (5, 5))
         cv2.imshow('img.jpg', (predictions[i]).astype("uint8"))
         k = cv2.waitKey(30) & 0xff
         predicted_img = Image.fromarray((predictions[i]).astype("uint8"), "L")
-        # real_label = Image.fromarray((l_test[i] * 255).astype("uint8"), "RGB")
         predicted_img.save("results_real/" + str(i) + ".png")
-        # real_label.save("results/real_" + str(i) + ".png")
