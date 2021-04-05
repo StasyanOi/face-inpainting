@@ -26,8 +26,8 @@ class DataLoader():
         dir_list = dataset.sort_names(os.listdir(merged))
         images = [dir_list[indexes[i]] for i in range(len(indexes))]
 
-        input = dataset.load_face_pictures_list(merged, images, color_mode="rgb")
-        potential_output = dataset.load_face_pictures_list(masked, images, color_mode="rgb")
+        input, _ = dataset.load_face_pictures_list(merged, images, color_mode="rgb")
+        potential_output, _ = dataset.load_face_pictures_list(masked, images, color_mode="rgb")
 
         input = input / 127.5 - 1.
         potential_output = potential_output / 127.5 - 1.
