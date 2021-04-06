@@ -154,8 +154,8 @@ class Pix2Pix():
         start_time = datetime.datetime.now()
 
         # Adversarial loss ground truths
-        valid = np.ones((10,) + self.disc_patch)
-        fake = np.zeros((10,) + self.disc_patch)
+        valid = np.ones((64,) + self.disc_patch)
+        fake = np.zeros((64,) + self.disc_patch)
 
         for epoch in range(epochs):
             (imgs_A, imgs_B, mask) = self.data_loader.load_data()
@@ -174,29 +174,32 @@ class Pix2Pix():
             fake_A_mask = imgs_A * (1 - mask) + fake_A * mask
             d_loss_fake_mask = self.discriminator_mask.train_on_batch([fake_A_mask, imgs_B], fake)
 
-            d_loss = [0, 0]
-            d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
-            d_loss += 0.5 * np.add(d_loss_real_mask, d_loss_fake_mask)
+            d_loss_whole = 0.5 * np.add(d_loss_real, d_loss_fake)
+            d_loss_mask = 0.5 * np.add(d_loss_real_mask, d_loss_fake_mask)
 
             # -----------------
             #  Train Generator
             # -----------------
 
             # Train the generators
-            g_loss = self.combined.train_on_batch([imgs_A, imgs_B], [valid, imgs_A])
+            g_loss = self.combined.train_on_batch([imgs_A, imgs_B], [valid, valid, imgs_A])
 
             elapsed_time = datetime.datetime.now() - start_time
             # Plot the progress
-            print("[Epoch %d/%d] [D loss: %f, acc: %3d%%] [G loss: %f] time: %s" % (epoch, epochs,
-                                                                                    d_loss[0],
-                                                                                    100 * d_loss[1],
-                                                                                    g_loss[0],
-                                                                                    elapsed_time))
+            print("[Epoch %d/%d] [D loss_whole: %f, acc: %3d%%] [D loss_mask: %f, acc: %3d%%] [G loss: %f] time: %s" % (
+            epoch, epochs,
+            d_loss_whole[0],
+            100 * d_loss_whole[1],
+            d_loss_mask[0],
+            100 * d_loss_mask[1],
+            g_loss[0],
+            elapsed_time))
 
             # If at save interval => save generated image samples
             # if epoch % sample_interval == 0:
-            self.sample_images(epoch)
-            self.generator.save("saved_models/inpaint_net", save_format="tf")
+            if epoch % 100 == 0:
+                self.sample_images(epoch)
+                self.generator.save("saved_models/inpaint_net" + str(epoch), save_format="tf")
 
     def sample_images(self, epoch):
         imgs_A, imgs_B = self.data_loader.load_data()
