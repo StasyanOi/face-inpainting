@@ -45,6 +45,10 @@ class Pix2Pix():
                                    optimizer=optimizer,
                                    metrics=['accuracy'])
 
+        self.discriminator_mask = self.build_discriminator()
+        self.discriminator_mask.compile(loss='mse', loss_weights=[2],
+                                        optimizer=optimizer,
+                                        metrics=['accuracy'])
         # -------------------------
         # Construct Computational
         #   Graph of Generator
@@ -63,13 +67,15 @@ class Pix2Pix():
 
         # For the combined model we will only train the generator
         self.discriminator.trainable = False
+        self.discriminator_mask.trainable = False
 
         # Discriminators determines validity of translated images / condition pairs
         valid = self.discriminator([fake_A, img_B])
+        valid_mask = self.discriminator_mask([fake_A, img_B])
 
-        self.combined = Model(inputs=[img_A, img_B], outputs=[valid, fake_A])
-        self.combined.compile(loss=['mse', 'mae'],
-                              loss_weights=[1, 100],
+        self.combined = Model(inputs=[img_A, img_B], outputs=[valid, valid_mask, fake_A])
+        self.combined.compile(loss=['mse', 'mse', 'mae'],
+                              loss_weights=[1, 2, 100],
                               optimizer=optimizer)
 
     def build_generator(self):
@@ -152,7 +158,7 @@ class Pix2Pix():
         fake = np.zeros((10,) + self.disc_patch)
 
         for epoch in range(epochs):
-            (imgs_A, imgs_B) = self.data_loader.load_data()
+            (imgs_A, imgs_B, mask) = self.data_loader.load_data()
             # ---------------------
             #  Train Discriminator
             # ---------------------
@@ -163,7 +169,14 @@ class Pix2Pix():
             # Train the discriminators (original images = real / generated = Fake)
             d_loss_real = self.discriminator.train_on_batch([imgs_A, imgs_B], valid)
             d_loss_fake = self.discriminator.train_on_batch([fake_A, imgs_B], fake)
+
+            d_loss_real_mask = self.discriminator_mask.train_on_batch([imgs_A, imgs_B], valid)
+            fake_A_mask = imgs_A * (1 - mask) + fake_A * mask
+            d_loss_fake_mask = self.discriminator_mask.train_on_batch([fake_A_mask, imgs_B], fake)
+
+            d_loss = [0, 0]
             d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
+            d_loss += 0.5 * np.add(d_loss_real_mask, d_loss_fake_mask)
 
             # -----------------
             #  Train Generator
