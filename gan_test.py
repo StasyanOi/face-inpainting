@@ -7,7 +7,8 @@ from tensorflow.keras.layers import LeakyReLU
 from tensorflow.keras.layers import UpSampling2D, Conv2D
 from tensorflow.keras.models import Sequential, Model, load_model
 from tensorflow.keras.optimizers import Adam
-
+from data_loader import DataLoader
+import PIL.Image as Image
 import matplotlib.pyplot as plt
 
 import sys
@@ -15,22 +16,16 @@ import sys
 import numpy as np
 
 if __name__ == '__main__':
-    generator = load_model("saved_models/mnist_generator", compile=False)
-    generator.summary()
-    latent_dim = 100
-    r, c = 5, 5
-    noise = np.random.normal(0, 1, (r * c, latent_dim))
-    gen_imgs = generator.predict(noise)
+    dl = DataLoader()
+    generator = load_model("saved_models/19900_inpaint", compile=False)
+    # generator.summary()
 
-    # Rescale images 0 - 1
-    gen_imgs = 0.5 * gen_imgs + 0.5
+    input = dl.load_img("train_data", "merge_centered_new.png")
 
-    fig, axs = plt.subplots(r, c)
-    cnt = 0
-    for i in range(r):
-        for j in range(c):
-            axs[i, j].imshow(gen_imgs[cnt, :, :, 0], cmap='gray')
-            axs[i, j].axis('off')
-            cnt += 1
-    fig.savefig("gan_images/mnist.png")
-    plt.close()
+    gen_imgs = generator.predict(input)
+
+    for i in range(len(gen_imgs)):
+        # Image.fromarray(((0.5 * potential_output[i] + 0.5) * 255).astype('uint8')).save("gan_images/real" + str(i) + ".png")
+        Image.fromarray(((0.5 * input[i] + 0.5) * 255).astype('uint8')).save("gan_images/input" + str(i) + ".png")
+        Image.fromarray(((0.5 * gen_imgs[i] + 0.5) * 255).astype('uint8')).save("gan_images/generated" + str(i) + ".png")
+

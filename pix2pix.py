@@ -1,23 +1,33 @@
 from __future__ import print_function, division
 
 import datetime
-import os
-
-import matplotlib.pyplot as plt
 import numpy as np
+import tensorflow as tf
+from tensorflow.keras.losses import mean_absolute_error
 from tensorflow.keras.layers import BatchNormalization
 from tensorflow.keras.layers import Input, Dropout, Concatenate
 from tensorflow.keras.layers import LeakyReLU
-from tensorflow.keras.layers import UpSampling2D, Conv2D
+from tensorflow.keras.layers import UpSampling2D, Conv2D, GlobalAveragePooling2D, Reshape, Dense, Permute, multiply
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
+from tensorflow_addons.layers import InstanceNormalization
+import tensorflow.keras.backend as K
 import PIL.Image as Image
 from data_loader import DataLoader
 
 
 class Pix2Pix():
+
+    def l1(self, y_true, y_pred):
+        return mean_absolute_error(y_true, y_pred)
+
+    def ssim_loss(self, y_true, y_pred):
+        return tf.reduce_mean(tf.image.ssim(y_true, y_pred, 2.0))
+
+    def generator_loss(self, y_true, y_pred):
+        return self.l1(y_true, y_pred) + self.ssim_loss(y_true, y_pred)
+
     def __init__(self):
-        # Input shape
         self.img_rows = 256
         self.img_cols = 256
         self.channels = 3
@@ -41,12 +51,12 @@ class Pix2Pix():
         # Build and compile the discriminator
         self.discriminator = self.build_discriminator()
         self.discriminator.summary()
-        self.discriminator.compile(loss='mse',
+        self.discriminator.compile(loss='binary_crossentropy',
                                    optimizer=optimizer,
                                    metrics=['accuracy'])
 
         self.discriminator_mask = self.build_discriminator()
-        self.discriminator_mask.compile(loss='mse', loss_weights=[2],
+        self.discriminator_mask.compile(loss='binary_crossentropy', loss_weights=[2],
                                         optimizer=optimizer,
                                         metrics=['accuracy'])
         # -------------------------
@@ -74,7 +84,7 @@ class Pix2Pix():
         valid_mask = self.discriminator_mask([fake_A, img_B])
 
         self.combined = Model(inputs=[img_A, img_B], outputs=[valid, valid_mask, fake_A])
-        self.combined.compile(loss=['mse', 'mse', 'mae'],
+        self.combined.compile(loss=['binary_crossentropy', 'binary_crossentropy', self.generator_loss],
                               loss_weights=[1, 2, 100],
                               optimizer=optimizer)
 
@@ -108,8 +118,8 @@ class Pix2Pix():
         d3 = conv2d(d2, self.gf * 4)
         d4 = conv2d(d3, self.gf * 8)
         d5 = conv2d(d4, self.gf * 8)
-        d6 = conv2d(d5, self.gf * 8)
-        d7 = conv2d(d6, self.gf * 8)
+        d6 = conv2d(d5, self.gf * 16)
+        d7 = conv2d(d6, self.gf * 16)
 
         # Upsampling
         u1 = deconv2d(d7, d6, self.gf * 8)
@@ -154,8 +164,8 @@ class Pix2Pix():
         start_time = datetime.datetime.now()
 
         # Adversarial loss ground truths
-        valid = np.ones((10,) + self.disc_patch)
-        fake = np.zeros((10,) + self.disc_patch)
+        valid = np.ones((64,) + self.disc_patch)
+        fake = np.zeros((64,) + self.disc_patch)
 
         for epoch in range(epochs):
             (imgs_A, imgs_B, mask) = self.data_loader.load_data()
@@ -174,32 +184,35 @@ class Pix2Pix():
             fake_A_mask = imgs_A * (1 - mask) + fake_A * mask
             d_loss_fake_mask = self.discriminator_mask.train_on_batch([fake_A_mask, imgs_B], fake)
 
-            d_loss = [0, 0]
-            d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
-            d_loss += 0.5 * np.add(d_loss_real_mask, d_loss_fake_mask)
+            d_loss_whole = 0.5 * np.add(d_loss_real, d_loss_fake)
+            d_loss_mask = 0.5 * np.add(d_loss_real_mask, d_loss_fake_mask)
 
             # -----------------
             #  Train Generator
             # -----------------
 
             # Train the generators
-            g_loss = self.combined.train_on_batch([imgs_A, imgs_B], [valid, imgs_A])
+            g_loss = self.combined.train_on_batch([imgs_A, imgs_B], [valid, valid, imgs_A])
 
             elapsed_time = datetime.datetime.now() - start_time
             # Plot the progress
-            print("[Epoch %d/%d] [D loss: %f, acc: %3d%%] [G loss: %f] time: %s" % (epoch, epochs,
-                                                                                    d_loss[0],
-                                                                                    100 * d_loss[1],
-                                                                                    g_loss[0],
-                                                                                    elapsed_time))
+            print("[Epoch %d/%d] [D loss_whole: %f, acc: %3d%%] [D loss_mask: %f, acc: %3d%%] [G loss: %f] time: %s" % (
+            epoch, epochs,
+            d_loss_whole[0],
+            100 * d_loss_whole[1],
+            d_loss_mask[0],
+            100 * d_loss_mask[1],
+            g_loss[0],
+            elapsed_time))
 
             # If at save interval => save generated image samples
             # if epoch % sample_interval == 0:
-            self.sample_images(epoch)
-            self.generator.save("saved_models/inpaint_net", save_format="tf")
+            if epoch % 100 == 0:
+                self.sample_images(epoch)
+                self.generator.save("saved_models/inpaint_net" + str(epoch), save_format="tf")
 
     def sample_images(self, epoch):
-        imgs_A, imgs_B = self.data_loader.load_data()
+        imgs_A, imgs_B, _ = self.data_loader.load_data()
         fake_A = self.generator.predict(imgs_B)
 
         Image.fromarray(((0.5 * imgs_A[0] + 0.5) * 255).astype('uint8')).save("gan_images/real.png")

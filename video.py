@@ -16,7 +16,7 @@ if __name__ == '__main__':
     os.mkdir("merged_real")
     os.mkdir("inpaint_real")
     model = load_model("saved_models/segment")
-    inpaint = load_model("saved_models/inpaint_face_gan")
+    inpaint = load_model("saved_models/13200_inpaint")
     # model.summary()
 
     cap = cv2.VideoCapture(0)

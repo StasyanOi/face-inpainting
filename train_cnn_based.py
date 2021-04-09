@@ -22,8 +22,8 @@ if __name__ == '__main__':
     model.compile(Adam(), loss=ssim_loss, metrics=[ssim_loss, 'accuracy'])
     model.summary()
 
-    features = dataset.load_face_pictures("train_data/balaclava/merged", img_num=731, color_mode='rgb')
-    labels = dataset.load_face_pictures("train_data/balaclava/not_masked", img_num=731, color_mode='rgb')
+    features, _ = dataset.load_face_pictures("train_data/balaclava/merged", img_num=731, color_mode='rgb')
+    labels, _ = dataset.load_face_pictures("train_data/balaclava/not_masked", img_num=731, color_mode='rgb')
     features = features / 255
     labels = labels / 255
 
