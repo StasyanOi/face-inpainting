@@ -17,11 +17,12 @@ if __name__ == '__main__':
     os.mkdir("inpaint_real")
     model = load_model("saved_models/segment")
     inpaint = load_model("saved_models/13200_inpaint")
+    print("loaded models")
     # model.summary()
 
     cap = cv2.VideoCapture(0)
 
-    img_number = 100
+    img_number = 200
     for i in range(img_number):
         ret, img = cap.read()
         img = img[:, 79:559, :]
@@ -33,6 +34,7 @@ if __name__ == '__main__':
             break
     cap.release()
     cv2.destroyAllWindows()
+    print("read input")
 
     masked_face_dir = "test_real"
     masked_faces, _ = dataset.load_face_pictures(masked_face_dir, img_num=img_number, color_mode='rgb')
@@ -41,15 +43,15 @@ if __name__ == '__main__':
     predictions = model.predict(features)
     predictions = np.round(predictions[:, :, :, 0]) * 255.0
     for i in range(len(predictions)):
-        predictions[i] = cv2.erode(predictions[i], (15, 15))
-        predictions[i] = cv2.dilate(predictions[i], (50, 50))
+        predictions[i] = cv2.erode(predictions[i], (1, 1))
+        predictions[i] = cv2.dilate(predictions[i], (20, 20))
         cv2.imshow('img.jpg', (predictions[i]).astype("uint8"))
         k = cv2.waitKey(30) & 0xff
         if k == 27:
             break
         predicted_img = Image.fromarray((predictions[i]).astype("uint8"), "L")
         predicted_img.save("results_real/" + str(i) + ".png")
-
+    print("done segmentation")
     dataset.merge_feature_mask("test_real", "results_real", "merged_real")
 
     faces_with_no_mask = "merged_real"
@@ -60,5 +62,7 @@ if __name__ == '__main__':
     for i in range(img_number):
         predictions[i] = ((0.5 * predictions[i] + 0.5) * 255)
         cv2.imshow('img.jpg', (predictions[i]).astype("uint8"))
+        k = cv2.waitKey(30) & 0xff
         predicted_img = Image.fromarray((predictions[i]).astype("uint8"))
         predicted_img.save(inpaint_real + "/" + str(i) + ".png")
+    print("done inpainting")
