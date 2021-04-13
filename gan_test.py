@@ -20,7 +20,7 @@ if __name__ == '__main__':
     generator = load_model("saved_models/19900_inpaint", compile=False)
     # generator.summary()
 
-    input = dl.load_img("train_data", "merge_centered_new.png")
+    input = dl.load_img("train_data", "merge_centered_new_2.png")
 
     gen_imgs = generator.predict(input)
 

@@ -6,6 +6,20 @@ import dataset
 import shutil
 import os
 
+def detectAndDisplay(frame):
+    frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    frame_gray = cv2.equalizeHist(frame_gray)
+    faces = face_cascade.detectMultiScale(frame_gray)
+    for (x, y, w, h) in faces:
+        x_ = int(x - w / 3)
+        y_ = int(y - h / 3) - 20
+        x_w = int(x + w + w / 3)
+        y_h = int(y + h + h / 3) - 20
+        frame = frame[y_:y_h, x_:x_w]
+    if frame is not None:
+        frame = cv2.resize(frame, (256, 256))
+    return frame
+
 if __name__ == '__main__':
     shutil.rmtree("test_real")
     shutil.rmtree("results_real")
@@ -20,14 +34,19 @@ if __name__ == '__main__':
     print("loaded models")
     # model.summary()
 
+    face_cascade_name = "haar/haarcascade_frontalface_alt.xml"
+    face_cascade = cv2.CascadeClassifier()
+    if not face_cascade.load(cv2.samples.findFile(face_cascade_name)):
+        print('--(!)Error loading face cascade')
+        exit(0)
+
     cap = cv2.VideoCapture(0)
 
-    img_number = 200
+    img_number = 100
     for i in range(img_number):
         ret, img = cap.read()
-        img = img[:, 79:559, :]
+        img = detectAndDisplay(img)
         cv2.imshow('img.png', img)
-        img = cv2.resize(img, dsize=(256, 256))
         cv2.imwrite("test_real/" + str(i) + '.png', img)
         k = cv2.waitKey(30) & 0xff
         if k == 27:
