@@ -60,6 +60,8 @@ def load_face_pictures_list(dir, lst, color_mode='grayscale'):
 
     for i in range(0, len(lst)):
         input_arr_feature = cv2.imread(dir + "/" + lst[i], mode)
+        if mode == 0:
+            input_arr_feature = np.resize(input_arr_feature, (256, 256, 1))
         images.append(input_arr_feature)
 
     batch_feature = np.array(images)  # Convert single image to a batch.
@@ -117,11 +119,14 @@ def merge_feature_mask(masked_people="./train_data/medical/CelebA-HQ-img-256-256
     img_labels = binary_labels + "/"
     merged = merged_dir + "/"
 
-    indexes = np.arange(0, 11000, 1000)
+    dir_list = sort_names(os.listdir(masked))
+
+    indexes = np.arange(0, 15000, 1000)
 
     for p in range(len(indexes) - 1):
-        features, f_list = load_face_pictures_batch(masked, indexes[p], indexes[p + 1], color_mode='rgb')
-        labels, l_list = load_face_pictures_batch(img_labels, indexes[p], indexes[p + 1])
+        files = [dir_list[i] for i in range(indexes[p + 1])]
+        features, f_list = load_face_pictures_list(masked, files, color_mode='rgb')
+        labels, l_list = load_face_pictures_list(img_labels, files)
 
         for i in range(len(features)):
             for j in range(features[i].shape[0]):
@@ -130,7 +135,7 @@ def merge_feature_mask(masked_people="./train_data/medical/CelebA-HQ-img-256-256
                         features[i][j, k, 0] = 255
                         features[i][j, k, 1] = 255
                         features[i][j, k, 2] = 255
-            Image.fromarray(features[i].astype('uint8')).save(merged + f_list[i])
+            cv2.imwrite(merged + f_list[i], features[i].astype('uint8'))
 
 
 if __name__ == '__main__':

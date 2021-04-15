@@ -1,6 +1,8 @@
 from __future__ import print_function, division
 
 import datetime
+
+import cv2.cv2 as cv2
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.losses import mean_absolute_error
@@ -215,9 +217,9 @@ class Pix2Pix():
         imgs_A, imgs_B, _ = self.data_loader.load_data()
         fake_A = self.generator.predict(imgs_B)
 
-        Image.fromarray(((0.5 * imgs_A[0] + 0.5) * 255).astype('uint8')).save("gan_images/real.png")
-        Image.fromarray(((0.5 * imgs_B[0] + 0.5) * 255).astype('uint8')).save("gan_images/input.png")
-        Image.fromarray(((0.5 * fake_A[0] + 0.5) * 255).astype('uint8')).save("gan_images/generated.png")
+        cv2.imwrite("gan_images/real.png", ((0.5 * imgs_A[0] + 0.5) * 255).astype('uint8'))
+        cv2.imwrite("gan_images/input.png", ((0.5 * imgs_B[0] + 0.5) * 255).astype('uint8'))
+        cv2.imwrite("gan_images/generated.png", ((0.5 * fake_A[0] + 0.5) * 255).astype('uint8'))
 
 
 if __name__ == '__main__':
