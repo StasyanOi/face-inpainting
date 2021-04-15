@@ -1,10 +1,12 @@
 import cv2.cv2 as cv2
+import numpy
 from tensorflow.keras.models import load_model
 import numpy as np
 import PIL.Image as Image
 import dataset
 import shutil
 import os
+
 
 def detectAndDisplay(frame):
     frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -16,9 +18,12 @@ def detectAndDisplay(frame):
         x_w = int(x + w + w / 3)
         y_h = int(y + h + h / 3) - 20
         frame = frame[y_:y_h, x_:x_w]
-    if frame is not None:
-        frame = cv2.resize(frame, (256, 256))
+        try:
+            frame = cv2.resize(frame, (256, 256))
+        except Exception as e:
+            print(str(e))
     return frame
+
 
 if __name__ == '__main__':
     shutil.rmtree("test_real")
@@ -30,7 +35,7 @@ if __name__ == '__main__':
     os.mkdir("merged_real")
     os.mkdir("inpaint_real")
     model = load_model("saved_models/segment")
-    inpaint = load_model("saved_models/13200_inpaint")
+    inpaint = load_model("saved_models/19900_inpaint")
     print("loaded models")
     # model.summary()
 
@@ -46,11 +51,14 @@ if __name__ == '__main__':
     for i in range(img_number):
         ret, img = cap.read()
         img = detectAndDisplay(img)
-        cv2.imshow('img.png', img)
-        cv2.imwrite("test_real/" + str(i) + '.png', img)
-        k = cv2.waitKey(30) & 0xff
-        if k == 27:
-            break
+        try:
+            cv2.imshow('img.png', img)
+            cv2.imwrite("test_real/" + str(i) + '.png', img)
+            k = cv2.waitKey(30) & 0xff
+            if k == 27:
+                break
+        except Exception as e:
+            print(str(e))
     cap.release()
     cv2.destroyAllWindows()
     print("read input")
@@ -62,8 +70,10 @@ if __name__ == '__main__':
     predictions = model.predict(features)
     predictions = np.round(predictions[:, :, :, 0]) * 255.0
     for i in range(len(predictions)):
-        predictions[i] = cv2.erode(predictions[i], (1, 1))
-        predictions[i] = cv2.dilate(predictions[i], (20, 20))
+        # predictions[i] = cv2.erode(predictions[i], (1, 1))
+        predictions[i] = cv2.dilate(predictions[i], (100, 100))
+
+        # predictions[i, 146:246, 70:180] = numpy.ones((100, 110)) * 255
         cv2.imshow('img.jpg', (predictions[i]).astype("uint8"))
         k = cv2.waitKey(30) & 0xff
         if k == 27:
