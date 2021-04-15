@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import PIL.Image as Image
 import os
+import cv2.cv2 as cv2
 
 
 def sort_names(dir):
@@ -50,10 +51,15 @@ def load_face_pictures_list(dir, lst, color_mode='grayscale'):
     # dataset = preprocessing.image_dataset_from_directory('dataset', color_mode='grayscale', image_size=(512, 512))
 
     images = []
+
+    mode = -1
+    if color_mode == 'grayscale':
+        mode = 0
+    else:
+        mode = 1
+
     for i in range(0, len(lst)):
-        feature = tensorflow.keras.preprocessing.image.load_img(dir + "/" + lst[i],
-                                                                color_mode=color_mode)
-        input_arr_feature = tensorflow.keras.preprocessing.image.img_to_array(feature)
+        input_arr_feature = cv2.imread(dir + "/" + lst[i], mode)
         images.append(input_arr_feature)
 
     batch_feature = np.array(images)  # Convert single image to a batch.
