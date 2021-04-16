@@ -31,13 +31,22 @@ def load_face_pictures(dir, img_num=128, color_mode='grayscale'):
     images = []
     for i in range(0, len(files)):
         input_arr_feature = cv2.imread(dir + "/" + files[i], mode)
-        if mode == 0:
-            input_arr_feature = np.resize(input_arr_feature, (256, 256, 1))
         images.append(input_arr_feature)
 
     batch_feature = np.array(images)  # Convert single image to a batch.
     return batch_feature, dir_list
 
+
+def load_seg_data(feature_dir, label_dir, img_num=128):
+    # dataset = preprocessing.image_dataset_from_directory('dataset', color_mode='grayscale', image_size=(512, 512))
+    dir_list = sort_names(os.listdir(feature_dir))
+    rands = np.random.randint(0, len(dir_list), img_num)
+    files = [dir_list[rands[i]] for i in range(len(rands))]
+
+    features, _ = load_face_pictures_list(feature_dir, files, color_mode="rgb")
+    labels, _ = load_face_pictures_list(label_dir, files, color_mode="grayscale")
+
+    return features, labels
 
 def load_face_pictures_batch(dir, start, end, color_mode='grayscale'):
     # dataset = preprocessing.image_dataset_from_directory('dataset', color_mode='grayscale', image_size=(512, 512))
