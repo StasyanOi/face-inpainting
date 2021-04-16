@@ -31,6 +31,8 @@ def load_face_pictures(dir, img_num=128, color_mode='grayscale'):
     images = []
     for i in range(0, len(files)):
         input_arr_feature = cv2.imread(dir + "/" + files[i], mode)
+        if mode == 0:
+            input_arr_feature = np.resize(input_arr_feature, (256, 256, 1))
         images.append(input_arr_feature)
 
     batch_feature = np.array(images)  # Convert single image to a batch.
