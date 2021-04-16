@@ -16,16 +16,21 @@ def sort_names(dir):
     return dir
 
 
-def load_face_pictures(dir, img_num=1000, color_mode='grayscale'):
+def load_face_pictures(dir, img_num=128, color_mode='grayscale'):
     # dataset = preprocessing.image_dataset_from_directory('dataset', color_mode='grayscale', image_size=(512, 512))
     dir_list = sort_names(os.listdir(dir))
-    dir_list = dir_list[:img_num]
+    rands = np.random.randint(0, len(dir_list), img_num)
+    files = [dir_list[rands[i]] for i in range(len(rands))]
+
+    mode = -1
+    if color_mode == 'grayscale':
+        mode = 0
+    else:
+        mode = 1
 
     images = []
-    for i in range(0, len(dir_list)):
-        feature = tensorflow.keras.preprocessing.image.load_img(dir + "/" + dir_list[i],
-                                                                color_mode=color_mode)
-        input_arr_feature = tensorflow.keras.preprocessing.image.img_to_array(feature)
+    for i in range(0, len(files)):
+        input_arr_feature = cv2.imread(dir + "/" + files[i], mode)
         images.append(input_arr_feature)
 
     batch_feature = np.array(images)  # Convert single image to a batch.
@@ -137,6 +142,26 @@ def merge_feature_mask(masked_people="./train_data/medical/CelebA-HQ-img-256-256
                         features[i][j, k, 2] = 255
             cv2.imwrite(merged + f_list[i], features[i].astype('uint8'))
 
+def merge_features(masked_people="./train_data/medical/CelebA-HQ-img-256-256-masked",
+                       binary_labels="./train_data/medical/CelebA-HQ-img-256-256-labels",
+                       merged_dir="./train_data/medical/CelebA-HQ-img-256-256-merged"):
+    masked = masked_people + "/"
+    img_labels = binary_labels + "/"
+    merged = merged_dir + "/"
+
+    dir_list = sort_names(os.listdir(masked))
+
+    features, f_list = load_face_pictures_list(masked, dir_list, color_mode='rgb')
+    labels, l_list = load_face_pictures_list(img_labels, dir_list)
+
+    for i in range(len(features)):
+        for j in range(features[i].shape[0]):
+            for k in range(features[i].shape[1]):
+                if labels[i][j, k] == 255:
+                    features[i][j, k, 0] = 255
+                    features[i][j, k, 1] = 255
+                    features[i][j, k, 2] = 255
+        cv2.imwrite(merged + f_list[i], features[i].astype('uint8'))
 
 if __name__ == '__main__':
     merge_feature_mask()

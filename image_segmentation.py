@@ -7,36 +7,27 @@ from sklearn.metrics import f1_score
 from tensorflow.keras.optimizers import Adam
 
 
-class SaveModelCallback(tensorflow.keras.callbacks.Callback):
-    def on_epoch_begin(self, epoch, logs=None):
-        self.generator.save("saved_models/inpaint_net", save_format="tf")
-
-
 def get_data(feature_dir, label_dir):
-    features, _ = dataset.load_face_pictures(feature_dir, color_mode="rgb")
-    labels, _ = dataset.load_face_pictures(label_dir, color_mode="grayscale")
+    features, _ = dataset.load_face_pictures(feature_dir, img_num=64, color_mode="rgb")
+    labels, _ = dataset.load_face_pictures(label_dir, img_num=64, color_mode="grayscale")
     features = features / 255
     labels = labels / 255
-    features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size=0.2)
 
-    return features_train, features_test, labels_train, labels_test
+    return features, labels
 
 
 if __name__ == '__main__':
     input_layer = Input((256, 256, 3))
     model = models.standard_unet(input_layer, 16)
 
-    model.compile(Adam(), loss='binary_crossentropy', metrics=["accuracy"])
+    model.compile(Adam(), loss='binary_crossentropy', metrics=[tensorflow.keras.metrics.MeanIoU(num_classes=2)])
 
-    tc = tensorflow.keras.callbacks.TensorBoard(log_dir="tensorboard")
-    smc = SaveModelCallback()
-
-    features_train, features_test, labels_train, labels_test = get_data(
-        "train_data/medical/CelebA-HQ-img-256-256-masked",
-        "train_data/medical/CelebA-HQ-img-256-256-labels")
-
-    model.fit(features_train, labels_train, batch_size=64, callbacks=[tc, smc], validation_split=0.1, epochs=200)
-
-    predicted_labels = model.predict(features_test)
-
-    print(f1_score(labels_test, predicted_labels, average=None))
+    epochs = 20000
+    for epoch in range(epochs):
+        features, labels = get_data(
+            "train_data/medical/CelebA-HQ-img-256-256-masked",
+            "train_data/medical/CelebA-HQ-img-256-256-labels")
+        loss_acc = model.train_on_batch(features, labels)
+        print("[Epoch %d/%d] [D loss_whole: %f, acc_iou: %3d%%]" % (epoch, epochs, loss_acc[0], loss_acc[1] * 100))
+        if epoch % 500 == 0:
+            model.save("saved_models/" + str(epoch) + "segment_net", save_format="tf")
