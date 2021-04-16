@@ -137,6 +137,26 @@ def merge_feature_mask(masked_people="./train_data/medical/CelebA-HQ-img-256-256
                         features[i][j, k, 2] = 255
             cv2.imwrite(merged + f_list[i], features[i].astype('uint8'))
 
+def merge_features(masked_people="./train_data/medical/CelebA-HQ-img-256-256-masked",
+                       binary_labels="./train_data/medical/CelebA-HQ-img-256-256-labels",
+                       merged_dir="./train_data/medical/CelebA-HQ-img-256-256-merged"):
+    masked = masked_people + "/"
+    img_labels = binary_labels + "/"
+    merged = merged_dir + "/"
+
+    dir_list = sort_names(os.listdir(masked))
+
+    features, f_list = load_face_pictures_list(masked, dir_list, color_mode='rgb')
+    labels, l_list = load_face_pictures_list(img_labels, dir_list)
+
+    for i in range(len(features)):
+        for j in range(features[i].shape[0]):
+            for k in range(features[i].shape[1]):
+                if labels[i][j, k] == 255:
+                    features[i][j, k, 0] = 255
+                    features[i][j, k, 1] = 255
+                    features[i][j, k, 2] = 255
+        cv2.imwrite(merged + f_list[i], features[i].astype('uint8'))
 
 if __name__ == '__main__':
     merge_feature_mask()

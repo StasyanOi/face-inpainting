@@ -66,8 +66,7 @@ if __name__ == '__main__':
         img_init = detectAndDisplay(img)
         # img_init = rearrange_channels(img_init)
         cv2.imwrite("temp.png", img_init)
-        feature = tensorflow.keras.preprocessing.image.load_img("temp.png", color_mode="rgb")
-        img = tensorflow.keras.preprocessing.image.img_to_array(feature)
+        img = cv2.imread("temp.png")
         img_ = np.array([img]) / 255
         predict = model.predict(img_)
 

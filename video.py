@@ -81,7 +81,7 @@ if __name__ == '__main__':
         predicted_img = Image.fromarray((predictions[i]).astype("uint8"), "L")
         predicted_img.save("results_real/" + str(i) + ".png")
     print("done segmentation")
-    dataset.merge_feature_mask("test_real", "results_real", "merged_real")
+    dataset.merge_features("test_real", "results_real", "merged_real")
 
     faces_with_no_mask = "merged_real"
     features, _ = dataset.load_face_pictures(faces_with_no_mask, img_num=img_number, color_mode='rgb')
