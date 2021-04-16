@@ -24,7 +24,7 @@ class DataLoader():
         labels = "train_data/medical/CelebA-HQ-img-256-256-labels"
         merged = "train_data/medical/CelebA-HQ-img-256-256-merged"
         masked = "train_data/medical/CelebA-HQ-img-256-256"
-        indexes = self.get_randoms(batch=32)
+        indexes = self.get_randoms(batch=64)
         dir_list = dataset.sort_names(os.listdir(merged))
         images = [dir_list[indexes[i]] for i in range(len(indexes))]
 
