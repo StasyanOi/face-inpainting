@@ -16,16 +16,21 @@ def sort_names(dir):
     return dir
 
 
-def load_face_pictures(dir, img_num=1000, color_mode='grayscale'):
+def load_face_pictures(dir, img_num=128, color_mode='grayscale'):
     # dataset = preprocessing.image_dataset_from_directory('dataset', color_mode='grayscale', image_size=(512, 512))
     dir_list = sort_names(os.listdir(dir))
-    dir_list = dir_list[:img_num]
+    rands = np.random.randint(0, len(dir_list), img_num)
+    files = [dir_list[rands[i]] for i in range(len(rands))]
+
+    mode = -1
+    if color_mode == 'grayscale':
+        mode = 0
+    else:
+        mode = 1
 
     images = []
-    for i in range(0, len(dir_list)):
-        feature = tensorflow.keras.preprocessing.image.load_img(dir + "/" + dir_list[i],
-                                                                color_mode=color_mode)
-        input_arr_feature = tensorflow.keras.preprocessing.image.img_to_array(feature)
+    for i in range(0, len(files)):
+        input_arr_feature = cv2.imread(dir + "/" + files[i], mode)
         images.append(input_arr_feature)
 
     batch_feature = np.array(images)  # Convert single image to a batch.
