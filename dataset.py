@@ -120,8 +120,7 @@ def merge(features, masks):
                     if mask[k, m] == 255:
                         feature[k][m][j] = 255
 
-        img = Image.fromarray(feature.astype('uint8'))
-        img.save("train_data/merged/" + str(i) + ".png")
+        cv2.imwrite("merged_real/" + str(i) + ".png", feature.astype('uint8'))
     return np.copy(features)
 
 

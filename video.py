@@ -13,10 +13,12 @@ def detectAndDisplay(frame):
     frame_gray = cv2.equalizeHist(frame_gray)
     faces = face_cascade.detectMultiScale(frame_gray)
     for (x, y, w, h) in faces:
-        x_ = int(x - w / 3)
-        y_ = int(y - h / 3) - 20
-        x_w = int(x + w + w / 3)
-        y_h = int(y + h + h / 3) - 20
+        i = 4
+        i1 = 20
+        x_ = int(x - w / i)
+        y_ = int(y - h / i) - i1
+        x_w = int(x + w + w / i)
+        y_h = int(y + h + h / i) - i1
         frame = frame[y_:y_h, x_:x_w]
         try:
             frame = cv2.resize(frame, (256, 256))
@@ -35,7 +37,7 @@ if __name__ == '__main__':
     os.mkdir("merged_real")
     os.mkdir("inpaint_real")
     model = load_model("saved_models/2500segment_net")
-    inpaint = load_model("saved_models/7300inpaint_net")
+    inpaint = load_model("saved_models/16600inpaint_net")
     print("loaded models")
     # model.summary()
 
@@ -46,14 +48,14 @@ if __name__ == '__main__':
         exit(0)
 
     cap = cv2.VideoCapture(0)
-
+    images = []
     img_number = 100
     for i in range(img_number):
         ret, img = cap.read()
         img = detectAndDisplay(img)
         try:
             cv2.imshow('img.png', img)
-            cv2.imwrite("test_real/" + str(i) + '.png', img)
+            images.append(img)
             k = cv2.waitKey(30) & 0xff
             if k == 27:
                 break
@@ -63,35 +65,30 @@ if __name__ == '__main__':
     cv2.destroyAllWindows()
     print("read input")
 
-    masked_face_dir = "test_real"
-    masked_faces, _ = dataset.load_face_pictures(masked_face_dir, img_num=img_number, color_mode='rgb')
+    masked_faces = np.stack(images)
+
     features = masked_faces / 255
 
     predictions = model.predict(features)
     predictions = np.round(predictions[:, :, :, 0]) * 255.0
     for i in range(len(predictions)):
-        # predictions[i] = cv2.erode(predictions[i], (1, 1))
-        predictions[i] = cv2.dilate(predictions[i], (100, 100))
-
-        # predictions[i, 146:246, 70:180] = numpy.ones((100, 110)) * 255
+        # predictions[i] = cv2.rotate(predictions[i], cv2.ROTATE_90_CLOCKWISE)
+        # predictions[i] = cv2.dilate(predictions[i], kernel=np.ones((10, 1)))
+        # predictions[i] = cv2.rotate(predictions[i], cv2.ROTATE_90_COUNTERCLOCKWISE)
         cv2.imshow('img.jpg', (predictions[i]).astype("uint8"))
         k = cv2.waitKey(30) & 0xff
         if k == 27:
             break
-        predicted_img = Image.fromarray((predictions[i]).astype("uint8"), "L")
-        predicted_img.save("results_real/" + str(i) + ".png")
-    print("done segmentation")
-    dataset.merge_features("test_real", "results_real", "merged_real")
 
-    faces_with_no_mask = "merged_real"
-    features, _ = dataset.load_face_pictures(faces_with_no_mask, img_num=img_number, color_mode='rgb')
-    features = features / 127.5 - 1
+    print("done segmentation")
+    features_merges = dataset.merge(masked_faces, predictions)
+
+    features_merges = features_merges / 127.5 - 1
     inpaint_real = "inpaint_real"
-    predictions = inpaint.predict(features)
+    predictions = inpaint.predict(features_merges)
     for i in range(img_number):
         predictions[i] = ((0.5 * predictions[i] + 0.5) * 255)
         cv2.imshow('img.jpg', (predictions[i]).astype("uint8"))
         k = cv2.waitKey(30) & 0xff
-        predicted_img = Image.fromarray((predictions[i]).astype("uint8"))
-        predicted_img.save(inpaint_real + "/" + str(i) + ".png")
+        cv2.imwrite(inpaint_real + "/" + str(i) + ".png", (predictions[i]).astype("uint8"))
     print("done inpainting")
