@@ -11,13 +11,14 @@ import os
 
 def detectAndDisplay(frame):
     frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    frame_gray = cv2.equalizeHist(frame_gray)
-    faces = face_cascade.detectMultiScale(frame_gray)
+    faces = face_cascade.detectMultiScale(frame_gray, scaleFactor=1.05)
     for (x, y, w, h) in faces:
-        x_ = int(x - w / 3)
-        y_ = int(y - h / 3) - 20
-        x_w = int(x + w + w / 3)
-        y_h = int(y + h + h / 3) - 20
+        widen = 4
+        up = 20
+        x_ = int(x - w / widen)
+        y_ = int(y - h / widen) - up
+        x_w = int(x + w + w / widen)
+        y_h = int(y + h + h / widen) - up
         frame = frame[y_:y_h, x_:x_w]
         try:
             frame = cv2.resize(frame, (256, 256))
@@ -49,11 +50,11 @@ if __name__ == '__main__':
     os.mkdir("merged_real")
     os.mkdir("inpaint_real")
     model = load_model("saved_models/2500segment_net")
-    inpaint = load_model("saved_models/7300inpaint_net")
+    inpaint = load_model("saved_models/10300inpaint_net")
     print("loaded models")
     # model.summary()
 
-    face_cascade_name = "haar/haarcascade_frontalface_alt.xml"
+    face_cascade_name = "haar/haarcascade_frontalface_alt2.xml"
     face_cascade = cv2.CascadeClassifier()
     if not face_cascade.load(cv2.samples.findFile(face_cascade_name)):
         print('--(!)Error loading face cascade')
@@ -64,6 +65,7 @@ if __name__ == '__main__':
     while 1:
         ret, img = cap.read()
         img = detectAndDisplay(img)
+        cv2.imwrite("temp.png", img)
         img_ = np.array([img]) / 255
         predict = None
         try:
@@ -83,7 +85,9 @@ if __name__ == '__main__':
             prediction = ((0.5 * prediction + 0.5) * 255)
 
             try:
-                cv2.imshow('image', prediction[0].astype('uint8'))
+                pred = prediction[0].astype('uint8')
+                cv2.imshow('image', pred)
+                cv2.imwrite("temp_gen.png", pred)
                 k = cv2.waitKey(30) & 0xff
                 if k == 27:
                     break

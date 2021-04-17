@@ -34,12 +34,12 @@ if __name__ == '__main__':
     os.mkdir("results_real")
     os.mkdir("merged_real")
     os.mkdir("inpaint_real")
-    model = load_model("saved_models/600segment_net")
-    inpaint = load_model("saved_models/19900_inpaint")
+    model = load_model("saved_models/2500segment_net")
+    inpaint = load_model("saved_models/7300inpaint_net")
     print("loaded models")
     # model.summary()
 
-    face_cascade_name = "haar/haarcascade_frontalface_alt.xml"
+    face_cascade_name = "haar/haarcascade_frontalface_alt2.xml"
     face_cascade = cv2.CascadeClassifier()
     if not face_cascade.load(cv2.samples.findFile(face_cascade_name)):
         print('--(!)Error loading face cascade')
