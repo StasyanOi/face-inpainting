@@ -48,8 +48,8 @@ if __name__ == '__main__':
     os.mkdir("results_real")
     os.mkdir("merged_real")
     os.mkdir("inpaint_real")
-    model = load_model("saved_models/segment")
-    inpaint = load_model("saved_models/19900_inpaint")
+    model = load_model("saved_models/2500segment_net")
+    inpaint = load_model("saved_models/7300inpaint_net")
     print("loaded models")
     # model.summary()
 
@@ -63,10 +63,7 @@ if __name__ == '__main__':
 
     while 1:
         ret, img = cap.read()
-        img_init = detectAndDisplay(img)
-        # img_init = rearrange_channels(img_init)
-        cv2.imwrite("temp.png", img_init)
-        img = cv2.imread("temp.png")
+        img = detectAndDisplay(img)
         img_ = np.array([img]) / 255
         predict = model.predict(img_)
 
