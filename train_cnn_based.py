@@ -1,38 +1,38 @@
-from tensorflow.keras.layers import *
-from tensorflow.keras.models import *
-from tensorflow.keras.utils import *
-from tensorflow.keras.callbacks import TensorBoard
-from tensorflow.keras.optimizers import *
-from tensorflow.keras.datasets import *
-from sklearn.model_selection import train_test_split
-import PIL.Image as Image
-import dataset
 import models
+import dataset
 import tensorflow as tf
+from tensorflow.keras.layers import *
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import f1_score
+from tensorflow.keras.optimizers import Adam
+import cv2.cv2 as cv2
 
 
-def ssim_loss(y_true, y_pred):
-    return 1 - tf.reduce_mean(tf.image.ssim(y_true, y_pred, 1.0))
-
-
-if __name__ == '__main__':
-    input_layer = Input((128, 128, 3))
-    model = models.standard_unet(input_layer, 16)
-    # model = load_model("inpaint_unet", compile=False)
-    model.compile(Adam(), loss=ssim_loss, metrics=[ssim_loss, 'accuracy'])
-    model.summary()
-
-    features, _ = dataset.load_face_pictures("train_data/balaclava/merged", img_num=731, color_mode='rgb')
-    labels, _ = dataset.load_face_pictures("train_data/balaclava/not_masked", img_num=731, color_mode='rgb')
+def get_data(feature_dir, label_dir):
+    features, labels = dataset.load_seg_data(feature_dir, label_dir, img_num=256)
     features = features / 255
     labels = labels / 255
+    return features, labels
 
-    (f_train, f_test, l_train, l_test) = train_test_split(features, labels, test_size=0.2)
 
-    tb = TensorBoard(log_dir="tensorboard")
+#!g1.1
+if __name__ == '__main__':
+    input_layer = Input((256, 256, 3))
+    model = models.standard_unet(input_layer, 16)
 
-    model.fit(f_train, l_train, validation_split=0.1, batch_size=32, epochs=50, callbacks=[tb])
+    model.compile(Adam(), loss='binary_crossentropy', metrics=["accuracy"])
 
-    predictions = model.predict(f_test)
-
-    model.save("inpaint_unet_new_mask")
+    epochs = 20000
+    for epoch in range(epochs):
+        features, labels = get_data("train_data/medical/CelebA-HQ-img-256-256-masked", "train_data/medical/CelebA-HQ-img-256-256-labels")
+        loss_acc = model.train_on_batch(features, labels)
+        print("[Epoch %d/%d] [D loss_whole: %f, acc_iou: %f]" % (epoch, epochs, loss_acc[0], loss_acc[1]))
+        if epoch % 100 == 0:
+            features, labels = get_data(
+                "train_data/medical/CelebA-HQ-img-256-256-masked",
+                "train_data/medical/CelebA-HQ-img-256-256-labels")
+            predictions = model.predict(features)
+            cv2.imwrite("gan_images/" + str(epoch)+ "_segment.png", (predictions[0] * 255).astype('uint8'))
+            cv2.imwrite("gan_images/" + str(epoch)+ "_segment_label.png", (labels[0] * 255).astype('uint8'))
+            cv2.imwrite("gan_images/" + str(epoch)+ "_segment_real.png", (features[0] * 255).astype('uint8'))
+            model.save("saved_models/" + str(epoch) + "segment_net", save_format="tf")
