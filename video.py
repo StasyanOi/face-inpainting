@@ -34,7 +34,7 @@ if __name__ == '__main__':
     os.mkdir("results_real")
     os.mkdir("merged_real")
     os.mkdir("inpaint_real")
-    model = load_model("saved_models/segment")
+    model = load_model("saved_models/600segment_net")
     inpaint = load_model("saved_models/19900_inpaint")
     print("loaded models")
     # model.summary()

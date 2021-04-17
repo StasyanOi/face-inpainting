@@ -48,8 +48,8 @@ if __name__ == '__main__':
     os.mkdir("results_real")
     os.mkdir("merged_real")
     os.mkdir("inpaint_real")
-    model = load_model("saved_models/segment")
-    inpaint = load_model("saved_models/19900_inpaint")
+    model = load_model("saved_models/2500segment_net")
+    inpaint = load_model("saved_models/7300inpaint_net")
     print("loaded models")
     # model.summary()
 
@@ -63,33 +63,33 @@ if __name__ == '__main__':
 
     while 1:
         ret, img = cap.read()
-        img_init = detectAndDisplay(img)
-        # img_init = rearrange_channels(img_init)
-        cv2.imwrite("temp.png", img_init)
-        img = cv2.imread("temp.png")
+        img = detectAndDisplay(img)
         img_ = np.array([img]) / 255
-        predict = model.predict(img_)
-
-        prediction = (np.round(predict[:, :, :, 0]) * 255.0).astype('uint8')
-
-        for j in range(img.shape[0]):
-            for k in range(img.shape[1]):
-                if prediction[0][j, k] == 255:
-                    img[j, k, 0] = 255
-                    img[j, k, 1] = 255
-                    img[j, k, 2] = 255
-
-        img = (img / 127.5) - 1
-
-        prediction = inpaint.predict(np.array([img]))
-        prediction = ((0.5 * prediction + 0.5) * 255)
-
+        predict = None
         try:
-            cv2.imshow('image', prediction[0].astype('uint8'))
-            k = cv2.waitKey(30) & 0xff
-            if k == 27:
-                break
+            predict = model.predict(img_)
+            prediction = (np.round(predict[:, :, :, 0]) * 255.0).astype('uint8')
+
+            for j in range(img.shape[0]):
+                for k in range(img.shape[1]):
+                    if prediction[0][j, k] == 255:
+                        img[j, k, 0] = 255
+                        img[j, k, 1] = 255
+                        img[j, k, 2] = 255
+
+            img = (img / 127.5) - 1
+
+            prediction = inpaint.predict(np.array([img]))
+            prediction = ((0.5 * prediction + 0.5) * 255)
+
+            try:
+                cv2.imshow('image', prediction[0].astype('uint8'))
+                k = cv2.waitKey(30) & 0xff
+                if k == 27:
+                    break
+            except Exception as e:
+                print(str(e))
         except Exception as e:
-            print(str(e))
+            print(e)
 
     cap.release()
