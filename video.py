@@ -14,7 +14,7 @@ def detectAndDisplay(frame):
     faces = face_cascade.detectMultiScale(frame_gray)
     for (x, y, w, h) in faces:
         i = 4
-        i1 = 20
+        i1 = 10
         x_ = int(x - w / i)
         y_ = int(y - h / i) - i1
         x_w = int(x + w + w / i)
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     os.mkdir("merged_real")
     os.mkdir("inpaint_real")
     model = load_model("saved_models/2500segment_net")
-    inpaint = load_model("saved_models/16600inpaint_net")
+    inpaint = load_model("saved_models/19200inpaint_net")
     print("loaded models")
     # model.summary()
 
@@ -72,9 +72,9 @@ if __name__ == '__main__':
     predictions = model.predict(features)
     predictions = np.round(predictions[:, :, :, 0]) * 255.0
     for i in range(len(predictions)):
-        # predictions[i] = cv2.rotate(predictions[i], cv2.ROTATE_90_CLOCKWISE)
-        # predictions[i] = cv2.dilate(predictions[i], kernel=np.ones((10, 1)))
-        # predictions[i] = cv2.rotate(predictions[i], cv2.ROTATE_90_COUNTERCLOCKWISE)
+        predictions[i] = cv2.rotate(predictions[i], cv2.ROTATE_90_CLOCKWISE)
+        predictions[i] = cv2.dilate(predictions[i], kernel=np.ones((10, 1)))
+        predictions[i] = cv2.rotate(predictions[i], cv2.ROTATE_90_COUNTERCLOCKWISE)
         cv2.imshow('img.jpg', (predictions[i]).astype("uint8"))
         k = cv2.waitKey(30) & 0xff
         if k == 27:

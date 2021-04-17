@@ -14,7 +14,7 @@ def detectAndDisplay(frame):
     faces = face_cascade.detectMultiScale(frame_gray, scaleFactor=1.05)
     for (x, y, w, h) in faces:
         widen = 4
-        up = 20
+        up = 10
         x_ = int(x - w / widen)
         y_ = int(y - h / widen) - up
         x_w = int(x + w + w / widen)
@@ -50,7 +50,7 @@ if __name__ == '__main__':
     os.mkdir("merged_real")
     os.mkdir("inpaint_real")
     model = load_model("saved_models/2500segment_net")
-    inpaint = load_model("saved_models/16600inpaint_net")
+    inpaint = load_model("saved_models/19200inpaint_net")
     print("loaded models")
     # model.summary()
 
