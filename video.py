@@ -13,8 +13,8 @@ def detectAndDisplay(frame):
     frame_gray = cv2.equalizeHist(frame_gray)
     faces = face_cascade.detectMultiScale(frame_gray)
     for (x, y, w, h) in faces:
-        i = 4
-        i1 = 10
+        i = 3
+        i1 = 20
         x_ = int(x - w / i)
         y_ = int(y - h / i) - i1
         x_w = int(x + w + w / i)
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     os.mkdir("merged_real")
     os.mkdir("inpaint_real")
     model = load_model("saved_models/2500segment_net")
-    inpaint = load_model("saved_models/19200inpaint_net")
+    inpaint = load_model("saved_models/26700inpaint_net")
     print("loaded models")
     # model.summary()
 

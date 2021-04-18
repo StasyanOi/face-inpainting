@@ -5,8 +5,8 @@ import os
 if __name__ == '__main__':
     files = os.listdir("inpaint_real")
     img = []
-    for i in range(0, 98):
-        img.append(cv2.imread("inpaint_real/" + str(i) + ".png"))
+    for i in range(0, len(files)):
+        img.append(cv2.imread("inpaint_real/" + files[i]))
 
     height, width, layers = img[1].shape
 
