@@ -1,3 +1,4 @@
+import cv2.cv2 as cv2
 import numpy as np
 from tensorflow.keras.layers import *
 from tensorflow.keras.models import *
@@ -13,18 +14,22 @@ def discriminator():
     kernel_initializer = "random_normal"
     kernel_regularizer = None
     dropout_rate = 0.4
+    pool_size = (2, 2)
     model.add(Conv2D(16, kernel_size=6, input_shape=(256, 256, 3), kernel_initializer=kernel_initializer,  kernel_regularizer=kernel_regularizer))
     model.add(LeakyReLU())
+    model.add(MaxPool2D(pool_size=pool_size))
     model.add(Conv2D(8, kernel_size=4, kernel_initializer=kernel_initializer,  kernel_regularizer=kernel_regularizer))
     model.add(LeakyReLU())
+    model.add(MaxPool2D(pool_size=pool_size))
     model.add(Conv2D(4, kernel_size=4, kernel_initializer=kernel_initializer,  kernel_regularizer=kernel_regularizer))
     model.add(LeakyReLU())
+    model.add(MaxPool2D(pool_size=pool_size))
     model.add(Conv2D(1, kernel_size=4, kernel_initializer=kernel_initializer,  kernel_regularizer=kernel_regularizer))
     model.add(Flatten())
     model.add(LeakyReLU())
     model.add(Dropout(dropout_rate))
     model.add(Dense(1, kernel_initializer=kernel_initializer))
-    model.add(LeakyReLU())
+    model.add(ReLU())
 
     model.compile(Adam(), "binary_crossentropy", metrics=['accuracy'])
     model.summary()
@@ -77,6 +82,13 @@ if __name__ == '__main__':
             la[0], la[1]))
 
         if epoch % 10 == 0:
+            predicted = model.predict(features)
+            cv2.imshow("imgae", (features[12] * 255).astype('uint8'))
+            k = cv2.waitKey(30) & 0xff
+            if k == 27:
+                break
+            print("Real: " + str(labels[12]))
+            print("Generated: " + str(predicted[12]))
             model.save("./saved_models/" + str(epoch) + "classifier", save_format="tf")
 
 
