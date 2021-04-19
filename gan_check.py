@@ -1,5 +1,6 @@
 import cv2.cv2 as cv2
 import numpy as np
+from tensorflow.keras.metrics import BinaryAccuracy
 from tensorflow.keras.layers import *
 from tensorflow.keras.models import *
 from tensorflow.keras.optimizers import *
@@ -30,8 +31,10 @@ def discriminator():
     model.add(Dropout(dropout_rate))
     model.add(Dense(1, kernel_initializer=kernel_initializer))
     model.add(ReLU())
-
-    model.compile(Adam(), "binary_crossentropy", metrics=['accuracy'])
+    ba = BinaryAccuracy(
+        name="binary_accuracy", threshold=0.5
+    )
+    model.compile(Adam(), "binary_crossentropy", metrics=[ba])
     model.summary()
 
     return model
