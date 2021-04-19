@@ -10,7 +10,7 @@ import os
 
 def detectAndDisplay(frame):
     frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    frame_gray = cv2.equalizeHist(frame_gray)
+    # frame_gray = cv2.equalizeHist(frame_gray)
     faces = face_cascade.detectMultiScale(frame_gray)
     for (x, y, w, h) in faces:
         i = 3
@@ -73,7 +73,7 @@ if __name__ == '__main__':
     predictions = np.round(predictions[:, :, :, 0]) * 255.0
     for i in range(len(predictions)):
         predictions[i] = cv2.rotate(predictions[i], cv2.ROTATE_90_CLOCKWISE)
-        predictions[i] = cv2.dilate(predictions[i], kernel=np.ones((10, 1)))
+        predictions[i] = cv2.dilate(predictions[i], kernel=np.ones((20, 1)))
         predictions[i] = cv2.rotate(predictions[i], cv2.ROTATE_90_COUNTERCLOCKWISE)
         cv2.imshow('img.jpg', (predictions[i]).astype("uint8"))
         k = cv2.waitKey(30) & 0xff

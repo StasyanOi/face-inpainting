@@ -72,9 +72,9 @@ if __name__ == '__main__':
             predict = model.predict(img_)
             prediction = (np.round(predict[0, :, :, :]) * 255.0).astype('uint8')
             cv2.imwrite("temp_1.png", prediction.reshape((256,256,1)))
-            # prediction = cv2.rotate(prediction, cv2.ROTATE_90_CLOCKWISE)
-            # prediction = cv2.dilate(prediction, kernel=np.ones((10,1)))
-            # prediction = cv2.rotate(prediction, cv2.ROTATE_90_COUNTERCLOCKWISE)
+            prediction = cv2.rotate(prediction, cv2.ROTATE_90_CLOCKWISE)
+            prediction = cv2.dilate(prediction, kernel=np.ones((20,1)))
+            prediction = cv2.rotate(prediction, cv2.ROTATE_90_COUNTERCLOCKWISE)
             cv2.imwrite("temp_2.png", prediction.reshape((256,256,1)))
             for j in range(img.shape[0]):
                 for k in range(img.shape[1]):
