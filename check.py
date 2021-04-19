@@ -29,14 +29,14 @@ if __name__ == '__main__':
         exit(0)
 
     cap = cv2.VideoCapture(0)
-    i = 0
+    i = 627
     while 1:
         ret, img = cap.read()
         img = detectAndDisplay(img)
         try:
             img = cv2.resize(img, (256, 256))
             cv2.imshow("img", img)
-            # cv2.imwrite("./me/" + str(i) + ".png", img)
+            cv2.imwrite("./me/" + str(i) + ".png", img)
             i = i + 1
             k = cv2.waitKey(30) & 0xff
             if k == 27:
