@@ -29,7 +29,7 @@ if __name__ == '__main__':
         exit(0)
 
     cap = cv2.VideoCapture(0)
-    i = 627
+    i = 1200
     while 1:
         ret, img = cap.read()
         img = detectAndDisplay(img)

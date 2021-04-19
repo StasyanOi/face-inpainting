@@ -29,8 +29,7 @@ def discriminator():
     model.add(Flatten())
     model.add(LeakyReLU())
     model.add(Dropout(dropout_rate))
-    model.add(Dense(1, kernel_initializer=kernel_initializer))
-    model.add(ReLU())
+    model.add(Dense(1, activation="sigmoid", kernel_initializer=kernel_initializer))
     ba = BinaryAccuracy(
         name="binary_accuracy", threshold=0.5
     )
