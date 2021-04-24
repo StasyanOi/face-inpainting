@@ -8,13 +8,14 @@ import dataset
 import shutil
 import os
 
+dialate = 15
+widen = 3
+up = 20
 
 def detectAndDisplay(frame):
     frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     faces = face_cascade.detectMultiScale(frame_gray, scaleFactor=1.05)
     for (x, y, w, h) in faces:
-        widen = 3
-        up = 20
         x_ = int(x - w / widen)
         y_ = int(y - h / widen) - up
         x_w = int(x + w + w / widen)
@@ -50,7 +51,7 @@ if __name__ == '__main__':
     os.mkdir("merged_real")
     os.mkdir("inpaint_real")
     model = load_model("saved_models/2500segment_net")
-    inpaint = load_model("saved_models/19200inpaint_net")
+    inpaint = load_model("saved_models/25100inpaint_net")
     print("loaded models")
     # model.summary()
 
@@ -73,7 +74,7 @@ if __name__ == '__main__':
             prediction = (np.round(predict[0, :, :, :]) * 255.0).astype('uint8')
             cv2.imwrite("temp_1.png", prediction.reshape((256,256,1)))
             prediction = cv2.rotate(prediction, cv2.ROTATE_90_CLOCKWISE)
-            prediction = cv2.dilate(prediction, kernel=np.ones((20,1)))
+            prediction = cv2.dilate(prediction, kernel=np.ones((dialate, 1)))
             prediction = cv2.rotate(prediction, cv2.ROTATE_90_COUNTERCLOCKWISE)
             cv2.imwrite("temp_2.png", prediction.reshape((256,256,1)))
             for j in range(img.shape[0]):

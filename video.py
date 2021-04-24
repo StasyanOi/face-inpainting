@@ -7,14 +7,16 @@ import dataset
 import shutil
 import os
 
-
+dialate = 15
+widen = 3
+up = 20
 def detectAndDisplay(frame):
     frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     # frame_gray = cv2.equalizeHist(frame_gray)
     faces = face_cascade.detectMultiScale(frame_gray)
     for (x, y, w, h) in faces:
-        i = 3
-        i1 = 20
+        i = widen
+        i1 = up
         x_ = int(x - w / i)
         y_ = int(y - h / i) - i1
         x_w = int(x + w + w / i)
@@ -37,7 +39,7 @@ if __name__ == '__main__':
     os.mkdir("merged_real")
     os.mkdir("inpaint_real")
     model = load_model("saved_models/2500segment_net")
-    inpaint = load_model("saved_models/26700inpaint_net")
+    inpaint = load_model("saved_models/25100inpaint_net")
     print("loaded models")
     # model.summary()
 
@@ -50,11 +52,13 @@ if __name__ == '__main__':
     cap = cv2.VideoCapture(0)
     images = []
     img_number = 100
+    test_real = "test_real"
     for i in range(img_number):
         ret, img = cap.read()
         img = detectAndDisplay(img)
         try:
             cv2.imshow('img.png', img)
+            cv2.imwrite(test_real + "/" + str(i) + ".png", img.astype("uint8"))
             images.append(img)
             k = cv2.waitKey(30) & 0xff
             if k == 27:
@@ -71,10 +75,12 @@ if __name__ == '__main__':
 
     predictions = model.predict(features)
     predictions = np.round(predictions[:, :, :, 0]) * 255.0
+    results_real = "results_real"
     for i in range(len(predictions)):
         predictions[i] = cv2.rotate(predictions[i], cv2.ROTATE_90_CLOCKWISE)
-        predictions[i] = cv2.dilate(predictions[i], kernel=np.ones((20, 1)))
+        predictions[i] = cv2.dilate(predictions[i], kernel=np.ones((dialate, 1)))
         predictions[i] = cv2.rotate(predictions[i], cv2.ROTATE_90_COUNTERCLOCKWISE)
+        cv2.imwrite(results_real + "/" + str(i) + ".png", predictions[i].astype("uint8"))
         cv2.imshow('img.jpg', (predictions[i]).astype("uint8"))
         k = cv2.waitKey(30) & 0xff
         if k == 27:
