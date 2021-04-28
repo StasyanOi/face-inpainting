@@ -6,6 +6,7 @@ import PIL.Image as Image
 import dataset
 import shutil
 import os
+import detection
 
 dialate = 15
 widen = 3
@@ -14,6 +15,7 @@ def detectAndDisplay(frame):
     frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     # frame_gray = cv2.equalizeHist(frame_gray)
     faces = face_cascade.detectMultiScale(frame_gray)
+    eyes = eye_cascade.detectMultiScale(frame_gray)
     for (x, y, w, h) in faces:
         i = widen
         i1 = up
@@ -22,6 +24,15 @@ def detectAndDisplay(frame):
         x_w = int(x + w + w / i)
         y_h = int(y + h + h / i) - i1
         frame = frame[y_:y_h, x_:x_w]
+        index = 0
+        for (eye_x, eye_y, eye_w, eye_h) in eyes:
+            if index == 0:
+                eye_1 = (eye_x, eye_y, eye_w, eye_h)
+            elif index == 1:
+                eye_2 = (eye_x, eye_y, eye_w, eye_h)
+
+            cv2.rectangle(frame, (eye_x, eye_y), (eye_x + eye_w, eye_y + eye_h), 2)
+            index = index + 1
         try:
             frame = cv2.resize(frame, (256, 256))
         except Exception as e:
@@ -43,11 +54,8 @@ if __name__ == '__main__':
     print("loaded models")
     # model.summary()
 
-    face_cascade_name = "haar/haarcascade_frontalface_alt2.xml"
-    face_cascade = cv2.CascadeClassifier()
-    if not face_cascade.load(cv2.samples.findFile(face_cascade_name)):
-        print('--(!)Error loading face cascade')
-        exit(0)
+    face_cascade = cv2.CascadeClassifier("haar/haarcascade_frontalface_alt2.xml")
+    eye_cascade = cv2.CascadeClassifier("haar/haarcascade_eye.xml")
 
     cap = cv2.VideoCapture(0)
     images = []
@@ -55,7 +63,7 @@ if __name__ == '__main__':
     test_real = "test_real"
     for i in range(img_number):
         ret, img = cap.read()
-        img = detectAndDisplay(img)
+        img = detection.getFace(img)
         try:
             cv2.imshow('img.png', img)
             cv2.imwrite(test_real + "/" + str(i) + ".png", img.astype("uint8"))

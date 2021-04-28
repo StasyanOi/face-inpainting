@@ -20,9 +20,13 @@ if __name__ == '__main__':
     img = []
     true = 0
     for i in range(0, len(files)):
-        unknown_image = face_recognition.load_image_file("compare/generated/" + files[i])
-        unknown_encoding = face_recognition.face_encodings(unknown_image)[0]
-        results = face_recognition.compare_faces([known_encoding], unknown_encoding)
-        if (results[0] == True):
-            true = true + 1
-        print(true / len(files))
+        try:
+            unknown_image = face_recognition.load_image_file("compare/generated/" + files[i])
+            unknown_encoding = face_recognition.face_encodings(unknown_image)[0]
+            results = face_recognition.compare_faces([known_encoding], unknown_encoding)
+            if (results[0] == True):
+                true = true + 1
+            print(i)
+            print(true / len(files))
+        except Exception as e:
+            print(str(e))

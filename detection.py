@@ -84,7 +84,10 @@ def getFace(image):
                 down_side = int(y1 + down)
 
                 result = result[up_side:down_side, left_side:right_side]
-                face = cv2.resize(result, (256, 256))
+                try:
+                    face = cv2.resize(result, (256, 256))
+                except Exception as e:
+                    print(str(e))
     return face
 
 if __name__ == '__main__':
