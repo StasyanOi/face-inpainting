@@ -18,6 +18,7 @@ predictor = dlib.shape_predictor("haar/shape_predictor_68_face_landmarks.dat")
 
 def getFace(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    gray = cv2.equalizeHist(gray)
     # loading the classifiers with respected files
     faces = face_cascade.detectMultiScale(gray, scaleFactor=1.10, minNeighbors=5)
     face = None
