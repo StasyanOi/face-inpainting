@@ -13,19 +13,25 @@ def sort_names(dir):
 
 
 def equalize(image):
-    R, G, B = cv2.split(image)
-    output1_R = cv2.equalizeHist(R)
-    output1_G = cv2.equalizeHist(G)
-    output1_B = cv2.equalizeHist(B)
-    return cv2.merge((output1_R, output1_G, output1_B))
+
+    lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
+
+    lab_planes = cv2.split(lab)
+
+    clahe = cv2.createCLAHE(clipLimit=1.0, tileGridSize=(8, 8))
+
+    lab_planes[0] = clahe.apply(lab_planes[0])
+
+    lab = cv2.merge(lab_planes)
+
+    return cv2.cvtColor(lab, cv2.COLOR_LAB2BGR)
 
 
 if __name__ == '__main__':
 
-    known_image = face_recognition.load_image_file("compare/me.png")
-
-    # known_image = equalize(known_image)
-
+    known_image = cv2.imread("compare/me.png", cv2.IMREAD_COLOR)
+    known_image = equalize(known_image)
+    cv2.imwrite("cont_me.png", known_image)
     known_encoding = face_recognition.face_encodings(known_image)[0]
 
     files = sort_names(os.listdir("compare/generated/"))
@@ -33,8 +39,9 @@ if __name__ == '__main__':
     true = 0
     for i in range(0, len(files)):
         try:
-            unknown_image = face_recognition.load_image_file("compare/generated/" + files[i])
-            # unknown_image = equalize(unknown_image)
+            unknown_image = cv2.imread("compare/generated/" + files[i], cv2.IMREAD_COLOR)
+            unknown_image = equalize(unknown_image)
+            cv2.imwrite("cont_me_un.png", unknown_image)
             unknown_encoding = face_recognition.face_encodings(unknown_image)[0]
             results = face_recognition.compare_faces([known_encoding], unknown_encoding)
             if (results[0] == True):
