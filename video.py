@@ -7,6 +7,7 @@ import dataset
 import shutil
 import os
 import detection
+import face_recogntition_temp
 
 dialate = 15
 widen = 3
@@ -49,7 +50,7 @@ if __name__ == '__main__':
     os.mkdir("results_real")
     os.mkdir("merged_real")
     os.mkdir("inpaint_real")
-    model = load_model("saved_models/800segment_net")
+    model = load_model("saved_models/1000segment_net")
     inpaint = load_model("saved_models/25100inpaint_net")
     print("loaded models")
     # model.summary()
@@ -100,9 +101,11 @@ if __name__ == '__main__':
     features_merges = features_merges / 127.5 - 1
     inpaint_real = "inpaint_real"
     predictions = inpaint.predict(features_merges)
-    for i in range(img_number):
+    for i in range(len(predictions)):
         predictions[i] = ((0.5 * predictions[i] + 0.5) * 255)
         cv2.imshow('img.jpg', (predictions[i]).astype("uint8"))
         k = cv2.waitKey(30) & 0xff
         cv2.imwrite(inpaint_real + "/" + str(i) + ".png", (predictions[i]).astype("uint8"))
     print("done inpainting")
+
+    face_recogntition_temp.face_recognize()
