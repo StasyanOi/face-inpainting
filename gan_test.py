@@ -38,8 +38,8 @@ if __name__ == '__main__':
     files = sort_names(os.listdir(masked_))
     images = []
     files_names = []
-    for i in range(300):
-        i_ = files[10000 + i]
+    for i in range(500):
+        i_ = files[15000 + i]
         files_names.append(i_)
         imread = cv2.imread(masked_ + i_)
         images.append(imread)
