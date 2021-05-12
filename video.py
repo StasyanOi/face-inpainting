@@ -52,12 +52,12 @@ def binary_segmentation(face_segments):
     face_segments_normalized = face_segments / 255
     binary_segments = model.predict(face_segments_normalized)
     binary_segments = np.round(binary_segments[:, :, :, 0]) * 255.0
-    results_real = "results_real"
+    binary_segmentation_dir = "binary_segmentation"
     for i in range(len(binary_segments)):
         binary_segments[i] = cv2.rotate(binary_segments[i], cv2.ROTATE_90_CLOCKWISE)
         binary_segments[i] = cv2.dilate(binary_segments[i], kernel=np.ones((detection.dialate, 1)))
         binary_segments[i] = cv2.rotate(binary_segments[i], cv2.ROTATE_90_COUNTERCLOCKWISE)
-        cv2.imwrite(results_real + "/" + str(i) + ".png", binary_segments[i].astype("uint8"))
+        cv2.imwrite(binary_segmentation_dir + "/" + str(i) + ".png", binary_segments[i].astype("uint8"))
         cv2.imshow('img.jpg', (binary_segments[i]).astype("uint8"))
         k = cv2.waitKey(30) & 0xff
         if k == 27:
@@ -80,13 +80,15 @@ def inpaint_face(empty_mask_segments):
 if __name__ == '__main__':
     print("Setting up environment")
 
-    shutil.rmtree("test_real")
-    shutil.rmtree("results_real")
-    shutil.rmtree("merged_real")
+    shutil.rmtree("video_capture")
+    shutil.rmtree("face_segmentation")
+    shutil.rmtree("binary_segmentation")
+    shutil.rmtree("merged_binary_face")
     shutil.rmtree("inpaint_real")
-    os.mkdir("test_real")
-    os.mkdir("results_real")
-    os.mkdir("merged_real")
+    os.mkdir("video_capture")
+    os.mkdir("face_segmentation")
+    os.mkdir("binary_segmentation")
+    os.mkdir("merged_binary_face")
     os.mkdir("inpaint_real")
 
     print("Loading Models")
