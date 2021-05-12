@@ -141,3 +141,4 @@ video_capture
 videos
 gan_images
 *.zip
+*.token
