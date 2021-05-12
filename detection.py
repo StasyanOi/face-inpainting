@@ -91,6 +91,43 @@ def getFace(image):
                     print(str(e))
     return face
 
+
+eye_cascade = cv2.CascadeClassifier("haar/haarcascade_eye.xml")
+
+dialate = 15
+widen = 3
+up = 20
+
+
+def detectAndDisplay(frame):
+    frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    frame_gray = cv2.equalizeHist(frame_gray)
+    faces = face_cascade.detectMultiScale(frame_gray)
+    eyes = eye_cascade.detectMultiScale(frame_gray)
+    for (x, y, w, h) in faces:
+        i = widen
+        i1 = up
+        x_ = int(x - w / i)
+        y_ = int(y - h / i) - i1
+        x_w = int(x + w + w / i)
+        y_h = int(y + h + h / i) - i1
+        frame = frame[y_:y_h, x_:x_w]
+        index = 0
+        for (eye_x, eye_y, eye_w, eye_h) in eyes:
+            if index == 0:
+                eye_1 = (eye_x, eye_y, eye_w, eye_h)
+            elif index == 1:
+                eye_2 = (eye_x, eye_y, eye_w, eye_h)
+
+            cv2.rectangle(frame, (eye_x, eye_y), (eye_x + eye_w, eye_y + eye_h), 2)
+            index = index + 1
+        try:
+            frame = cv2.resize(frame, (256, 256))
+        except Exception as e:
+            print(str(e))
+    return frame
+
+
 if __name__ == '__main__':
     cap = cv2.VideoCapture(0)
     while 1:
