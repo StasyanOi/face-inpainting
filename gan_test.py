@@ -2,20 +2,12 @@ from __future__ import print_function, division
 
 import os
 
-from tensorflow.keras.datasets import mnist
-from tensorflow.keras.layers import Input, Dense, Reshape, Flatten, Dropout
-from tensorflow.keras.layers import BatchNormalization, Activation, ZeroPadding2D
-from tensorflow.keras.layers import LeakyReLU
-from tensorflow.keras.layers import UpSampling2D, Conv2D
-from tensorflow.keras.models import Sequential, Model, load_model
-from tensorflow.keras.optimizers import Adam
-from data_loader import DataLoader
-import PIL.Image as Image
 import cv2.cv2 as cv2
-import dataset
-import matplotlib.pyplot as plt
+from tensorflow.keras.models import load_model
 
-import sys
+import dataset
+from data_loader import DataLoader
+
 
 def sort_names(dir):
     ints = []

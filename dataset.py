@@ -120,7 +120,8 @@ def merge(features, masks):
                     if mask[k, m] == 255:
                         feature[k][m][j] = 255
 
-        cv2.imwrite("merged_real/" + str(i) + ".png", feature.astype('uint8'))
+        merged_binary_face = "merged_binary_face"
+        cv2.imwrite(merged_binary_face + "/" + str(i) + ".png", feature.astype('uint8'))
     return np.copy(features)
 
 

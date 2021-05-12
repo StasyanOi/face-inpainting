@@ -28,7 +28,6 @@ def dice_coef(y_true, y_pred, smooth=1):
 def dice_coef_loss(y_true, y_pred):
     return 1 - dice_coef(y_true, y_pred)
 
-
 def get_data(feature_dir, label_dir):
     features, labels = dataset.load_seg_data(feature_dir, label_dir, img_num=256)
     features = features / 255
