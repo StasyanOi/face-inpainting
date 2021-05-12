@@ -1,21 +1,9 @@
-import random
-
-import cv2
-import numpy as np
 import os
-
-def sort_names(dir):
-    ints = []
-    for i in range(len(dir)):
-        ints.append(int(dir[i].split(".")[0]))
-    ints.sort()
-    for i in range(len(dir)):
-        dir[i] = str(ints[i]) + ".png"
-    return dir
-
+import dataset
+import cv2
 
 if __name__ == '__main__':
-    files = sort_names(os.listdir("inpaint_real"))
+    files = dataset.sort_names(os.listdir("inpaint_real"))
     img = []
     for i in range(0, len(files)):
         img.append(cv2.imread("inpaint_real/" + files[i]))

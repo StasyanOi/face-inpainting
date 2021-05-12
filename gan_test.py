@@ -3,31 +3,19 @@ from __future__ import print_function, division
 import os
 
 import cv2.cv2 as cv2
+import numpy as np
 from tensorflow.keras.models import load_model
 
 import dataset
 from data_loader import DataLoader
 
-
-def sort_names(dir):
-    ints = []
-    for i in range(len(dir)):
-        ints.append(int(dir[i].split(".")[0]))
-    ints.sort()
-    for i in range(len(dir)):
-        dir[i] = str(ints[i]) + ".png"
-    return dir
-
-import numpy as np
-
 if __name__ == '__main__':
     dl = DataLoader()
     generator = load_model("saved_models/25100inpaint_net")
     model = load_model("saved_models/1000segment_net")
-    # generator.summary()
     masked_ = "train_data/medical/CelebA-HQ-img-256-256-masked/"
     real_ = "train_data/medical/CelebA-HQ-img-256-256/"
-    files = sort_names(os.listdir(masked_))
+    files = dataset.sort_names(os.listdir(masked_))
     images = []
     files_names = []
     for i in range(500):
@@ -48,7 +36,8 @@ if __name__ == '__main__':
     predictions = generator.predict(features)
 
     for i in range(len(predictions)):
-        cv2.imwrite("compare/metrics/custom/generated/" + str(i) + ".png", ((0.5 * predictions[i] + 0.5) * 255).astype('uint8'))
-        cv2.imwrite("compare/metrics/custom/real/" + str(i) + ".png", cv2.imread("train_data/medical/CelebA-HQ-img-256-256/"
-                                                                                 + files_names[i]))
-
+        cv2.imwrite("compare/metrics/custom/generated/" + str(i) + ".png",
+                    ((0.5 * predictions[i] + 0.5) * 255).astype('uint8'))
+        cv2.imwrite("compare/metrics/custom/real/" + str(i) + ".png",
+                    cv2.imread("train_data/medical/CelebA-HQ-img-256-256/"
+                               + files_names[i]))

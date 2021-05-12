@@ -1,19 +1,8 @@
 import os
-
+import dataset
 import cv2.cv2 as cv2
 import face_recognition
 import numpy as np
-
-
-def sort_names(dir):
-    ints = []
-    for i in range(len(dir)):
-        ints.append(int(dir[i].split(".")[0]))
-    ints.sort()
-    for i in range(len(dir)):
-        dir[i] = str(ints[i]) + ".png"
-    return dir
-
 
 def equalize(image):
     lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
@@ -33,7 +22,7 @@ def face_recognize():
     known_image = cv2.imread("compare/me.png", cv2.IMREAD_COLOR)
     # known_image = equalize(known_image)
     known_encoding = face_recognition.face_encodings(known_image)[0]
-    files = sort_names(os.listdir("inpaint_real/"))
+    files = dataset.sort_names(os.listdir("inpaint_real/"))
     encodings = []
     imgs = []
     print("getting encodings")
