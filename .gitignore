@@ -139,5 +139,5 @@ saved_models
 train_data
 video_capture
 videos
-gan_iamges
+gan_images
 *.zip
