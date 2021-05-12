@@ -170,21 +170,21 @@ class Pix2Pix():
         fake = np.zeros((64,) + self.disc_patch)
 
         for epoch in range(epochs):
-            (imgs_A, imgs_B, mask) = self.data_loader.load_data()
+            (potential_output, input, mask) = self.data_loader.load_data()
             # ---------------------
             #  Train Discriminator
             # ---------------------
 
             # Condition on B and generate a translated version
-            fake_A = self.generator.predict(imgs_B)
+            generated = self.generator.predict(input)
 
             # Train the discriminators (original images = real / generated = Fake)
-            d_loss_real = self.discriminator.train_on_batch([imgs_A, imgs_B], valid)
-            d_loss_fake = self.discriminator.train_on_batch([fake_A, imgs_B], fake)
+            d_loss_real = self.discriminator.train_on_batch([potential_output, input], valid)
+            d_loss_fake = self.discriminator.train_on_batch([generated, input], fake)
 
-            d_loss_real_mask = self.discriminator_mask.train_on_batch([imgs_A, imgs_B], valid)
-            fake_A_mask = imgs_A * (1 - mask) + fake_A * mask
-            d_loss_fake_mask = self.discriminator_mask.train_on_batch([fake_A_mask, imgs_B], fake)
+            d_loss_real_mask = self.discriminator_mask.train_on_batch([potential_output, input], valid)
+            fake_A_mask = potential_output * (1 - mask) + generated * mask
+            d_loss_fake_mask = self.discriminator_mask.train_on_batch([fake_A_mask, input], fake)
 
             d_loss_whole = 0.5 * np.add(d_loss_real, d_loss_fake)
             d_loss_mask = 0.5 * np.add(d_loss_real_mask, d_loss_fake_mask)
@@ -194,7 +194,7 @@ class Pix2Pix():
             # -----------------
 
             # Train the generators
-            g_loss = self.combined.train_on_batch([imgs_A, imgs_B], [valid, valid, imgs_A])
+            g_loss = self.combined.train_on_batch([potential_output, input], [valid, valid, potential_output])
 
             elapsed_time = datetime.datetime.now() - start_time
             # Plot the progress

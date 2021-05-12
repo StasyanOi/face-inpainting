@@ -86,9 +86,9 @@ def load_face_pictures_list(dir, lst, color_mode='grayscale'):
         input_arr_feature = cv2.imread(dir + "/" + lst[i], mode)
         if mode == 0:
             input_arr_feature = np.resize(input_arr_feature, (256, 256, 1))
-        # elif mode == 1:
-        #     alpha = (np.random.rand(1) * 2)
-        #     input_arr_feature = cv2.convertScaleAbs(input_arr_feature, alpha=alpha[0], beta=0)
+        elif mode == 1:
+            alpha = (np.random.rand(1) * 2)
+            input_arr_feature = cv2.convertScaleAbs(input_arr_feature, alpha=alpha[0], beta=0)
         images.append(input_arr_feature)
 
     batch_feature = np.array(images)  # Convert single image to a batch.
@@ -120,7 +120,8 @@ def merge(features, masks):
                     if mask[k, m] == 255:
                         feature[k][m][j] = 255
 
-        cv2.imwrite("merged_real/" + str(i) + ".png", feature.astype('uint8'))
+        merged_binary_face = "merged_binary_face"
+        cv2.imwrite(merged_binary_face + "/" + str(i) + ".png", feature.astype('uint8'))
     return np.copy(features)
 
 

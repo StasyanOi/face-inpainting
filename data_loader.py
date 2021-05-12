@@ -17,7 +17,7 @@ class DataLoader():
     def get_randoms(self, batch=32):
         rands = []
         for i in range(0, batch):
-            rands.append(random.randint(0, 9999))
+            rands.append(random.randint(0, 9000))
         return rands
 
     def load_data(self):
