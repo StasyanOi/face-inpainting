@@ -18,7 +18,7 @@ import PIL.Image as Image
 from data_loader import DataLoader
 
 
-class Pix2Pix():
+class InpaintModel():
 
     def l1(self, y_true, y_pred):
         return mean_absolute_error(y_true, y_pred)
@@ -223,5 +223,5 @@ class Pix2Pix():
 
 
 if __name__ == '__main__':
-    gan = Pix2Pix()
+    gan = InpaintModel()
     gan.train(epochs=200, batch_size=1, sample_interval=200)
