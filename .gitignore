@@ -127,7 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-.idea
 venv
 binary_segmentation
 compare
@@ -142,4 +141,6 @@ video_capture
 videos
 gan_images
 *.zip
+.idea
 *.token
+*.iml

@@ -24,7 +24,7 @@ class Pix2Pix():
         return mean_absolute_error(y_true, y_pred)
 
     def ssim_loss(self, y_true, y_pred):
-        return tf.reduce_mean(tf.image.ssim(y_true, y_pred, 2.0))
+        return 1 - tf.reduce_mean(tf.image.ssim(y_true, y_pred, 1.0))
 
     def generator_loss(self, y_true, y_pred):
         return self.l1(y_true, y_pred) + self.ssim_loss(y_true, y_pred)

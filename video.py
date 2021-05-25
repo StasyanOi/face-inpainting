@@ -94,6 +94,8 @@ if __name__ == '__main__':
     print("Loading Models")
     model = load_model("saved_models/2500segment_net")
     inpaint = load_model("saved_models/25100inpaint_net")
+    face_cascade = cv2.CascadeClassifier("haar/haarcascade_frontalface_alt2.xml")
+    eye_cascade = cv2.CascadeClassifier("haar/haarcascade_eye.xml")
     print("Models loaded")
 
     video_frames = capture_video()
