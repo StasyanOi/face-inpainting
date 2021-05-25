@@ -94,6 +94,30 @@ def load_face_pictures_list(dir, lst, color_mode='grayscale'):
     batch_feature = np.array(images)  # Convert single image to a batch.
     return batch_feature, lst
 
+def load_face_pictures_list_no_brightness(dir, lst, color_mode='grayscale'):
+    # dataset = preprocessing.image_dataset_from_directory('dataset', color_mode='grayscale', image_size=(512, 512))
+
+    images = []
+
+    mode = -1
+    if color_mode == 'grayscale':
+        mode = 0
+    else:
+        mode = 1
+
+    for i in range(0, len(lst)):
+        input_arr_feature = cv2.imread(dir + "/" + lst[i], mode)
+        if mode == 0:
+            input_arr_feature = np.resize(input_arr_feature, (256, 256, 1))
+        elif mode == 1:
+            input_arr_feature = np.resize(input_arr_feature, (256, 256, 3))
+            # alpha = (np.random.rand(1) * 2)
+            # input_arr_feature = cv2.convertScaleAbs(input_arr_feature, alpha=alpha[0], beta=0)
+        images.append(input_arr_feature)
+
+    batch_feature = np.array(images)  # Convert single image to a batch.
+    return batch_feature, lst
+
 def apply_mask(features, masks):
     for i in range(len(features)):
         feature = features[i]
