@@ -18,7 +18,7 @@ import PIL.Image as Image
 from data_loader import DataLoader
 
 
-class Pix2Pix():
+class InpaintModel():
 
     def l1(self, y_true, y_pred):
         return mean_absolute_error(y_true, y_pred)
@@ -161,16 +161,16 @@ class Pix2Pix():
 
         return Model([img_A, img_B], validity)
 
-    def train(self, epochs, batch_size=1, sample_interval=50):
+    def train(self, epochs, batch_size=64, sample_interval=100):
 
         start_time = datetime.datetime.now()
 
         # Adversarial loss ground truths
-        valid = np.ones((64,) + self.disc_patch)
-        fake = np.zeros((64,) + self.disc_patch)
+        valid = np.ones((batch_size,) + self.disc_patch)
+        fake = np.zeros((batch_size,) + self.disc_patch)
 
         for epoch in range(epochs):
-            (potential_output, input, mask) = self.data_loader.load_data()
+            (potential_output, input, mask) = self.data_loader.load_data(batch_size=batch_size)
             # ---------------------
             #  Train Discriminator
             # ---------------------
@@ -208,13 +208,12 @@ class Pix2Pix():
             elapsed_time))
 
             # If at save interval => save generated image samples
-            # if epoch % sample_interval == 0:
-            if epoch % 100 == 0:
+            if epoch % sample_interval == 0:
                 self.sample_images(epoch)
                 self.generator.save("saved_models/inpaint_net" + str(epoch), save_format="tf")
 
     def sample_images(self, epoch):
-        imgs_A, imgs_B, _ = self.data_loader.load_data()
+        imgs_A, imgs_B, _ = self.data_loader.load_data(batch_size=1)
         fake_A = self.generator.predict(imgs_B)
 
         cv2.imwrite("gan_images/real.png", ((0.5 * imgs_A[0] + 0.5) * 255).astype('uint8'))
@@ -223,5 +222,5 @@ class Pix2Pix():
 
 
 if __name__ == '__main__':
-    gan = Pix2Pix()
-    gan.train(epochs=200, batch_size=1, sample_interval=200)
+    gan = InpaintModel()
+    gan.train(epochs=80000, batch_size=64, sample_interval=100)

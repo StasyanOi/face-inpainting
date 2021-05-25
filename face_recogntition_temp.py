@@ -1,18 +1,10 @@
 import os
-
+import random
+from collections import Counter
 import cv2.cv2 as cv2
 import face_recognition
 import numpy as np
-
-
-def sort_names(dir):
-    ints = []
-    for i in range(len(dir)):
-        ints.append(int(dir[i].split(".")[0]))
-    ints.sort()
-    for i in range(len(dir)):
-        dir[i] = str(ints[i]) + ".png"
-    return dir
+import dataset
 
 
 def equalize(image):
@@ -29,40 +21,78 @@ def equalize(image):
     return cv2.cvtColor(lab, cv2.COLOR_LAB2BGR)
 
 
+def get_randoms(batch=32):
+    rands = []
+    for i in range(0, batch):
+        rands.append(random.randint(0, 9000))
+    return rands
+
+
+def get_random_faces():
+    celeba = "train_data/medical/CelebA-HQ-img-256-256/"
+    files = os.listdir(celeba)
+    images = []
+    rands = get_randoms(batch=1000)
+    for i in range(len(rands)):
+        images.append(cv2.imread(celeba + files[i], cv2.IMREAD_COLOR))
+    etalon = "guf.png"
+    etalon2 = "me.png"
+    current_person_image = cv2.imread("compare/%s" % etalon, cv2.IMREAD_COLOR)
+    current_person_image2 = cv2.imread("compare/%s" % etalon2, cv2.IMREAD_COLOR)
+    images.append(current_person_image)
+    images.append(current_person_image2)
+    img_files = [files[i] for i in rands]
+    img_files.append(etalon)
+    img_files.append(etalon2)
+    return np.array(images), img_files
+
+
 def face_recognize():
-    known_image = cv2.imread("compare/me.png", cv2.IMREAD_COLOR)
-    # known_image = equalize(known_image)
-    known_encoding = face_recognition.face_encodings(known_image)[0]
-    files = sort_names(os.listdir("inpaint_real/"))
+    random_face_images, file_names = get_random_faces()
+    encodings_faces = []
+    for i in range(len(random_face_images)):
+        face_encodings = face_recognition.face_encodings(random_face_images[i])
+        if len(face_encodings) != 0:
+            encodings_faces.append(face_encodings[0])
+        else:
+            file_names.remove(file_names[i])
+    file_names = np.array(file_names)
+    files = dataset.sort_names(os.listdir("inpaint_real/"))
     encodings = []
     imgs = []
     print("getting encodings")
     stop = len(files)
     for i in range(0, stop):
         unknown_image = cv2.imread("inpaint_real/" + files[i], cv2.IMREAD_COLOR)
-        # unknown_image = equalize(unknown_image)
         imgs.append(unknown_image)
     for i in range(0, stop):
         face_encodings = face_recognition.face_encodings(imgs[i])
         if len(face_encodings) != 0:
             encodings.append(face_encodings[0])
     encodings = np.stack(encodings)
-    results = face_recognition.compare_faces([known_encoding], encodings)
-    print("calc probability")
-    true = 0
-    res_len = len(results)
-    for i in range(res_len):
-        if results[i]:
-            true = true + 1
+    all_files = []
+    for i in range(len(encodings)):
+        results = np.array(face_recognition.compare_faces(encodings_faces, encodings[i]))
+        matched_image_files = file_names[results]
+        all_files.extend(matched_image_files)
+    c = Counter(all_files)
+    keys = list(c.keys())
+    values = np.array(list(c.values())) / len(files)
+    tuples = []
 
-    true_stop = true / res_len
+    for x, y in zip(keys, values):
+        if "me.png" in x:
+            if y > 0.5:
+                print(1)
+            elif 0.4 < y <= 0.5:
+                print(0.5)
+            elif y <= 0.4:
+                print(0)
+        tuples.append((y, x))
 
-    if true_stop >= 0.5:
-        print(1)
-    elif 0.4 <= true_stop < 0.5:
-        print(0.5)
-    else:
-        print(0)
+    tuples.sort()
+    print(tuples)
+
 
 if __name__ == '__main__':
     face_recognize()
