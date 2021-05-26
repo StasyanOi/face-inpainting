@@ -44,8 +44,6 @@ def getFace(image):
             dX = x2 - x1
             angle = np.degrees(np.arctan2(dY, dX))
 
-            between_eyes = math.sqrt((dY ** 2 + dX ** 2))
-
             eyesCenter = ((x1 + x2) // 2, (y1 + y2) // 2)
 
             rot_mat = cv2.getRotationMatrix2D(eyesCenter, angle, 1.0)
@@ -71,7 +69,6 @@ def getFace(image):
                 dX = x2 - x1
 
                 between_eyes = math.sqrt((dY ** 2 + dX ** 2))
-                print(between_eyes)
 
                 width = between_eyes * 4
 

@@ -131,7 +131,6 @@ venv
 binary_segmentation
 compare
 face_segmentation
-haar
 inpaint_real
 logs
 merged_binary_face
