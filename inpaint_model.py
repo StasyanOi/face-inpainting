@@ -53,12 +53,12 @@ class InpaintModel():
         # Build and compile the discriminator
         self.discriminator = self.build_discriminator()
         self.discriminator.summary()
-        self.discriminator.compile(loss='binary_crossentropy',
+        self.discriminator.compile(loss='mse',
                                    optimizer=optimizer,
                                    metrics=['accuracy'])
 
         self.discriminator_mask = self.build_discriminator()
-        self.discriminator_mask.compile(loss='binary_crossentropy', loss_weights=[2],
+        self.discriminator_mask.compile(loss='mse', loss_weights=[2],
                                         optimizer=optimizer,
                                         metrics=['accuracy'])
         # -------------------------
@@ -86,7 +86,7 @@ class InpaintModel():
         valid_mask = self.discriminator_mask([fake_A, img_B])
 
         self.combined = Model(inputs=[img_A, img_B], outputs=[valid, valid_mask, fake_A])
-        self.combined.compile(loss=['binary_crossentropy', 'binary_crossentropy', self.generator_loss],
+        self.combined.compile(loss=['mse', 'mse', self.generator_loss],
                               loss_weights=[1, 2, 100],
                               optimizer=optimizer)
 
@@ -216,9 +216,9 @@ class InpaintModel():
         imgs_A, imgs_B, _ = self.data_loader.load_data(batch_size=1)
         fake_A = self.generator.predict(imgs_B)
 
-        cv2.imwrite("gan_images/real.png", ((0.5 * imgs_A[0] + 0.5) * 255).astype('uint8'))
-        cv2.imwrite("gan_images/input.png", ((0.5 * imgs_B[0] + 0.5) * 255).astype('uint8'))
-        cv2.imwrite("gan_images/generated.png", ((0.5 * fake_A[0] + 0.5) * 255).astype('uint8'))
+        cv2.imwrite("gan_images/real" + str(epoch) + ".png", ((0.5 * imgs_A[0] + 0.5) * 255).astype('uint8'))
+        cv2.imwrite("gan_images/input" + str(epoch) + ".png", ((0.5 * imgs_B[0] + 0.5) * 255).astype('uint8'))
+        cv2.imwrite("gan_images/generated" + str(epoch) + ".png", ((0.5 * fake_A[0] + 0.5) * 255).astype('uint8'))
 
 
 if __name__ == '__main__':
