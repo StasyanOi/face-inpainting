@@ -10,11 +10,11 @@ import detection
 import face_recogntition_temp
 
 
-def capture_video():
+def capture_video(frames=30):
     print("capture video")
     cap = cv2.VideoCapture(0)
     images = []
-    img_number = 100
+    img_number = frames
     video_capture_dir = "video_capture"
     for i in range(img_number):
         ret, img = cap.read()
@@ -38,12 +38,13 @@ def face_segment(video_frames):
     for i in range(len(video_frames)):
         img = video_frames[i]
         img = detection.getFace(img)
-        cv2.imshow('face', img)
-        cv2.imwrite(face_segmentation + "/" + str(i) + ".png", img.astype("uint8"))
-        faces.append(img)
-        k = cv2.waitKey(30) & 0xff
-        if k == 27:
-            break
+        if img is not None:
+            cv2.imshow('face', img)
+            cv2.imwrite(face_segmentation + "/" + str(i) + ".png", img.astype("uint8"))
+            faces.append(img)
+            k = cv2.waitKey(30) & 0xff
+            if k == 27:
+                break
     return np.stack(faces)
 
 
@@ -92,13 +93,13 @@ if __name__ == '__main__':
     os.mkdir("inpaint_real")
 
     print("Loading Models")
-    model = load_model("saved_models/2500segment_net")
+    model = load_model("saved_models/1000segment_net")
     inpaint = load_model("saved_models/25100inpaint_net")
     face_cascade = cv2.CascadeClassifier("haar/haarcascade_frontalface_alt2.xml")
     eye_cascade = cv2.CascadeClassifier("haar/haarcascade_eye.xml")
     print("Models loaded")
 
-    video_frames = capture_video()
+    video_frames = capture_video(30)
 
     face_segments = face_segment(video_frames)
 
