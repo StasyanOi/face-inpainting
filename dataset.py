@@ -87,6 +87,7 @@ def load_face_pictures_list(dir, lst, color_mode='grayscale'):
         if mode == 0:
             input_arr_feature = np.resize(input_arr_feature, (256, 256, 1))
         elif mode == 1:
+            input_arr_feature = np.resize(input_arr_feature, (256, 256, 3))
             alpha = (np.random.rand(1) * 2)
             input_arr_feature = cv2.convertScaleAbs(input_arr_feature, alpha=alpha[0], beta=0)
         images.append(input_arr_feature)
