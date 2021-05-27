@@ -6,6 +6,7 @@ import face_recognition
 import numpy as np
 import dataset
 
+me_file = "me.png"
 
 def equalize(image):
     lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
@@ -36,7 +37,7 @@ def get_random_faces():
     for i in range(len(rands)):
         images.append(cv2.imread(celeba + files[i], cv2.IMREAD_COLOR))
     etalon = "guf.png"
-    etalon2 = "me.png"
+    etalon2 = me_file
     current_person_image = cv2.imread("compare/%s" % etalon, cv2.IMREAD_COLOR)
     current_person_image2 = cv2.imread("compare/%s" % etalon2, cv2.IMREAD_COLOR)
     images.append(current_person_image)
@@ -81,7 +82,7 @@ def face_recognize():
     tuples = []
 
     for x, y in zip(keys, values):
-        if "me.png" in x:
+        if me_file in x:
             if y > 0.5:
                 print(1)
             elif 0.4 < y <= 0.5:
@@ -90,7 +91,7 @@ def face_recognize():
                 print(0)
         tuples.append((y, x))
 
-    if "me.png" not in keys:
+    if me_file not in keys:
         print(0)
 
     tuples.sort()
