@@ -90,6 +90,9 @@ def face_recognize():
                 print(0)
         tuples.append((y, x))
 
+    if "me.png" not in keys:
+        print(0)
+
     tuples.sort()
     print(tuples)
 
