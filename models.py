@@ -2,7 +2,7 @@ from tensorflow.keras.layers import *
 from tensorflow.keras.models import *
 
 
-def standard_unet(input_layer, start_neurons):
+def segmentation_autoencoder(input_layer, start_neurons):
 
     # conv down
     conv1 = Conv2D(start_neurons * 1, (3, 3), activation="relu", padding="same")(input_layer)
