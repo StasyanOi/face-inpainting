@@ -56,6 +56,7 @@ def load_seg_data(feature_dir, label_dir, img_num=128):
 
     return features, labels
 
+
 def load_face_pictures_batch(dir, start, end, color_mode='grayscale'):
     # dataset = preprocessing.image_dataset_from_directory('dataset', color_mode='grayscale', image_size=(512, 512))
     dir_list = sort_names(os.listdir(dir))
@@ -70,6 +71,7 @@ def load_face_pictures_batch(dir, start, end, color_mode='grayscale'):
 
     batch_feature = np.array(images)  # Convert single image to a batch.
     return batch_feature, dir_list
+
 
 def load_face_pictures_list(dir, lst, color_mode='grayscale'):
     # dataset = preprocessing.image_dataset_from_directory('dataset', color_mode='grayscale', image_size=(512, 512))
@@ -95,6 +97,7 @@ def load_face_pictures_list(dir, lst, color_mode='grayscale'):
     batch_feature = np.array(images)  # Convert single image to a batch.
     return batch_feature, lst
 
+
 def load_face_pictures_list_no_brightness(dir, lst, color_mode='grayscale'):
     # dataset = preprocessing.image_dataset_from_directory('dataset', color_mode='grayscale', image_size=(512, 512))
 
@@ -119,6 +122,7 @@ def load_face_pictures_list_no_brightness(dir, lst, color_mode='grayscale'):
     batch_feature = np.array(images)  # Convert single image to a batch.
     return batch_feature, lst
 
+
 def apply_mask(features, masks):
     for i in range(len(features)):
         feature = features[i]
@@ -137,13 +141,13 @@ def apply_mask(features, masks):
 def merge(features, masks):
     for i in range(len(features)):
         feature = features[i]
-        mask = masks[i]
+        mask = masks[i].astype('uint8')
 
-        for j in range(feature.shape[2]):
-            for k in range(feature.shape[0]):
-                for m in range(feature.shape[1]):
-                    if mask[k, m] == 255:
-                        feature[k][m][j] = 255
+        inverted = (np.invert(mask) / 255).astype('uint8')
+
+        feature[:, :, 0] = feature[:, :, 0] * inverted + mask
+        feature[:, :, 1] = feature[:, :, 1] * inverted + mask
+        feature[:, :, 2] = feature[:, :, 2] * inverted + mask
 
         merged_binary_face = "merged_binary_face"
         cv2.imwrite(merged_binary_face + "/" + str(i) + ".png", feature.astype('uint8'))
@@ -189,9 +193,10 @@ def merge_feature_mask(masked_people="./train_data/medical/CelebA-HQ-img-256-256
                         features[i][j, k, 2] = 255
             cv2.imwrite(merged + f_list[i], features[i].astype('uint8'))
 
+
 def merge_features(masked_people="./train_data/medical/CelebA-HQ-img-256-256-masked",
-                       binary_labels="./train_data/medical/CelebA-HQ-img-256-256-labels",
-                       merged_dir="./train_data/medical/CelebA-HQ-img-256-256-merged"):
+                   binary_labels="./train_data/medical/CelebA-HQ-img-256-256-labels",
+                   merged_dir="./train_data/medical/CelebA-HQ-img-256-256-merged"):
     masked = masked_people + "/"
     img_labels = binary_labels + "/"
     merged = merged_dir + "/"
@@ -209,6 +214,7 @@ def merge_features(masked_people="./train_data/medical/CelebA-HQ-img-256-256-mas
                     features[i][j, k, 1] = 255
                     features[i][j, k, 2] = 255
         cv2.imwrite(merged + f_list[i], features[i].astype('uint8'))
+
 
 if __name__ == '__main__':
     merge_feature_mask()
