@@ -15,7 +15,7 @@ def get_data(feature_dir, label_dir):
 
 if __name__ == '__main__':
     input_layer = Input((256, 256, 3))
-    model = models.standard_unet(input_layer, 16)
+    model = models.segmentation_autoencoder(input_layer, 16)
 
     model.compile(Adam(), loss=["binary_crossentropy"], metrics=["accuracy"])
 
