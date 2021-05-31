@@ -4,3 +4,4 @@ conda create --name tf_gpu
 conda activate tf_gpu
 conda install tensorflow
 conda install scikit-learn
+conda install face_recognition
