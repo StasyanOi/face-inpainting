@@ -8,6 +8,7 @@ import dataset
 
 me_file = "me.png"
 
+
 def equalize(image):
     lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
 
@@ -58,13 +59,15 @@ def face_recognize():
         else:
             file_names.remove(file_names[i])
     file_names = np.array(file_names)
-    files = dataset.sort_names(os.listdir("inpaint_real/"))
+    inpaint_real = "inpaint_real"
+    print("Read files from dir " + inpaint_real)
+    files = dataset.sort_names(os.listdir("%s/" % inpaint_real))
     encodings = []
     imgs = []
     print("getting encodings")
     stop = len(files)
     for i in range(0, stop):
-        unknown_image = cv2.imread("inpaint_real/" + files[i], cv2.IMREAD_COLOR)
+        unknown_image = cv2.imread(inpaint_real + "/" + files[i], cv2.IMREAD_COLOR)
         imgs.append(unknown_image)
     for i in range(0, stop):
         face_encodings = face_recognition.face_encodings(imgs[i])
