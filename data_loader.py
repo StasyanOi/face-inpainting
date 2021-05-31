@@ -1,12 +1,7 @@
 import os
-
-import scipy
-import dataset
-import tensorflow
-from glob import glob
-import numpy as np
-import matplotlib.pyplot as plt
 import random
+
+import dataset
 
 
 class DataLoader():

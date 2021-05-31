@@ -1,18 +1,10 @@
 from skimage.metrics import *
 import cv2.cv2 as cv2
 import os
-
-def sort_names(dir):
-    ints = []
-    for i in range(len(dir)):
-        ints.append(int(dir[i].split(".")[0]))
-    ints.sort()
-    for i in range(len(dir)):
-        dir[i] = str(ints[i]) + ".png"
-    return dir
+import dataset
 
 if __name__ == '__main__':
-    files = sort_names(os.listdir("compare/metrics/custom/real/"))
+    files = dataset.sort_names(os.listdir("compare/metrics/custom/real/"))
     total_ssim = 0
     total_psnr = 0
     for i in range(len(files)):
