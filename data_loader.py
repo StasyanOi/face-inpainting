@@ -5,9 +5,6 @@ import dataset
 
 
 class DataLoader():
-    def __init__(self, dataset_name="test", img_res=(128, 128)):
-        self.dataset_name = dataset_name
-        self.img_res = img_res
 
     def get_randoms(self, batch=32):
         rands = []
