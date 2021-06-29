@@ -5,6 +5,7 @@ import cv2.cv2 as cv2
 import face_recognition
 import numpy as np
 import dataset
+import datetime
 
 me_file = "me.png"
 
@@ -51,6 +52,9 @@ def get_random_faces():
 
 def face_recognize():
     random_face_images, file_names = get_random_faces()
+    print("one")
+    now = datetime.datetime.now()
+    print(now)
     encodings_faces = []
     for i in range(len(random_face_images)):
         face_encodings = face_recognition.face_encodings(random_face_images[i])
@@ -58,6 +62,9 @@ def face_recognize():
             encodings_faces.append(face_encodings[0])
         else:
             file_names.remove(file_names[i])
+    print("two")
+    print(datetime.datetime.now())
+    print(datetime.datetime.now() - now)
     file_names = np.array(file_names)
     inpaint_real = "inpaint_real"
     print("Read files from dir " + inpaint_real)
@@ -74,6 +81,8 @@ def face_recognize():
         if len(face_encodings) != 0:
             encodings.append(face_encodings[0])
     encodings = np.stack(encodings)
+    print("three")
+    print(datetime.datetime.now())
     all_files = []
     for i in range(len(encodings)):
         results = np.array(face_recognition.compare_faces(encodings_faces, encodings[i]))
@@ -83,6 +92,8 @@ def face_recognize():
     keys = list(c.keys())
     values = np.array(list(c.values())) / len(files)
     tuples = []
+    print("four")
+    print(datetime.datetime.now())
 
     for x, y in zip(keys, values):
         if me_file in x:

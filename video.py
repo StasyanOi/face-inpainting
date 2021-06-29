@@ -1,5 +1,6 @@
 import os
 import shutil
+import datetime
 
 import cv2.cv2 as cv2
 import numpy as np
@@ -103,16 +104,25 @@ def capture_video(frames=30):
 
 
 if __name__ == '__main__':
+
     inpaint_system = InpaintSystem()
 
+    print(datetime.datetime.now())
+
     video_frames = capture_video(30)
+    print(datetime.datetime.now())
 
     face_segments = inpaint_system.face_segment(video_frames)
+    print(datetime.datetime.now())
 
     binary_segments = inpaint_system.binary_segmentation(face_segments)
+    print(datetime.datetime.now())
 
     empty_mask_segments = inpaint_system.merge(face_segments, binary_segments)
+    print(datetime.datetime.now())
 
     inpaint_system.inpaint_face(empty_mask_segments)
+    print(datetime.datetime.now())
 
     face_recogntition_system.face_recognize()
+    print(datetime.datetime.now())
