@@ -1,3 +1,4 @@
+# INSTALL ANACONDA BEFORE RUNNING THE SETUP
 # From the public folder https://disk.yandex.ru/d/VDWjzzpifhpBTw
 # download the files:
 # face_inpainting/medical/CelebA-HQ-img-256-256.zip
@@ -25,11 +26,6 @@ mkdir face_segmentation
 mkdir inpaint_real
 mkdir video_capture
 mkdir merged_binary_face
-
-# Download the installer for Anaconda environment manager and install Conda
-curl -O https://repo.anaconda.com/archive/Anaconda3-2020.07-Linux-x86_64.sh
-chmod +x Anaconda3-2020.07-Linux-x86_64.sh
-./Anaconda3-2020.07-Linux-x86_64.sh
 
 # Add Conda Forge (Community package repository)
 conda config --append channels conda-forge
