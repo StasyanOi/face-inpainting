@@ -7,6 +7,7 @@ import numpy as np
 import dataset
 import datetime
 
+# place in compare folder
 me_file = "me.png"
 
 
