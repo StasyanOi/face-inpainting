@@ -27,6 +27,7 @@ mkdir face_segmentation
 mkdir inpaint_real
 mkdir video_capture
 mkdir merged_binary_face
+mkdir gan_images
 
 # Add Conda Forge (Community package repository)
 conda config --append channels conda-forge
@@ -39,3 +40,4 @@ conda install scikit-learn
 conda install face_recognition
 pip install opencv-python
 pip install scikit-image
+pip install tensorflow_addons
