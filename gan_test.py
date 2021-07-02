@@ -39,7 +39,7 @@ if __name__ == '__main__':
     predictions = generator.predict(features)
 
     for i in range(len(predictions)):
-        cv2.imwrite("compare/metrics/custom/generated/" + str(i) + ".png", ((0.5 * predictions[i] + 0.5) * 255).astype('uint8'))
-        cv2.imwrite("compare/metrics/custom/real/" + str(i) + ".png", cv2.imread("train_data/medical/CelebA-HQ-img-256-256/"
+        cv2.imwrite("metrics/custom/generated/" + str(i) + ".png", ((0.5 * predictions[i] + 0.5) * 255).astype('uint8'))
+        cv2.imwrite("metrics/custom/real/" + str(i) + ".png", cv2.imread("train_data/medical/CelebA-HQ-img-256-256/"
                                                                                  + files_names[i]))
 

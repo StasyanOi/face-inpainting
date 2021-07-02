@@ -145,3 +145,4 @@ gan_images
 *.iml
 logs/save
 Anaconda3-2020.07-Linux-x86_64.sh
+metrics

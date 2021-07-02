@@ -22,6 +22,7 @@ unzip CelebA-HQ-img-256-256-merged.zip -d train_data/medical
 
 mkdir binary_segmentation
 mkdir compare
+mkdir metrics
 mkdir face_segmentation
 mkdir inpaint_real
 mkdir video_capture
@@ -37,3 +38,4 @@ conda install tensorflow
 conda install scikit-learn
 conda install face_recognition
 pip install opencv-python
+pip install scikit-image
