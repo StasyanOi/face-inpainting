@@ -131,7 +131,6 @@ venv
 binary_segmentation
 compare
 face_segmentation
-haar
 inpaint_real
 logs
 merged_binary_face
@@ -144,4 +143,6 @@ gan_images
 .idea
 *.token
 *.iml
-save
+logs/save
+Anaconda3-2020.07-Linux-x86_64.sh
+metrics
