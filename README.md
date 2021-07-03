@@ -1,6 +1,6 @@
 # face-inpainting
 
-This project proved functionality to train and use a system of neural nets for inpainting faces
+This project proves functionality to train and use a system of neural nets to inpaint faces
 
 To set up the environment run setup.sh
 
