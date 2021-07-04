@@ -105,8 +105,8 @@ if __name__ == '__main__':
     mr = 0
     begin = datetime.datetime.now()
     print(begin)
-    start = 20000
-    stop = 20050
+    start = 19000
+    stop = 19100
     indexes = range(start, stop)
     apply_inpainting = False
     for i in indexes:
