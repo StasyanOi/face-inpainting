@@ -50,6 +50,14 @@ def get_random_faces():
     img_files.append(etalon2)
     return np.array(images), img_files
 
+def get_face(file):
+    celeba = "train_data/medical/CelebA-HQ-img-256-256/"
+    images = []
+    images.append(cv2.imread(celeba + file, cv2.IMREAD_COLOR))
+    img_files = []
+    img_files.append(file)
+    return np.array(images), img_files
+
 
 def face_recognize():
     random_face_images, file_names = get_random_faces()
@@ -111,6 +119,69 @@ def face_recognize():
 
     tuples.sort()
     print(tuples)
+    return tuples
+
+def face_identify(file):
+    random_face_images, file_names = get_face(file)
+    print("one")
+    now = datetime.datetime.now()
+    print(now)
+    encodings_faces = []
+    for i in range(len(random_face_images)):
+        face_encodings = face_recognition.face_encodings(random_face_images[i])
+        if len(face_encodings) != 0:
+            encodings_faces.append(face_encodings[0])
+        else:
+            file_names.remove(file_names[i])
+    print("two")
+    print(datetime.datetime.now())
+    print(datetime.datetime.now() - now)
+    file_names = np.array(file_names)
+    inpaint_real = "inpaint_real"
+    print("Read files from dir " + inpaint_real)
+    files = dataset.sort_names(os.listdir("%s/" % inpaint_real))
+    encodings = []
+    imgs = []
+    print("getting encodings")
+    stop = len(files)
+    for i in range(0, stop):
+        unknown_image = cv2.imread(inpaint_real + "/" + files[i], cv2.IMREAD_COLOR)
+        imgs.append(unknown_image)
+    for i in range(0, stop):
+        face_encodings = face_recognition.face_encodings(imgs[i])
+        if len(face_encodings) != 0:
+            encodings.append(face_encodings[0])
+    encodings = np.stack(encodings)
+    print("three")
+    print(datetime.datetime.now())
+    all_files = []
+    for i in range(len(encodings)):
+        results = np.array(face_recognition.compare_faces(encodings_faces, encodings[i]))
+        matched_image_files = file_names[results]
+        all_files.extend(matched_image_files)
+    c = Counter(all_files)
+    keys = list(c.keys())
+    values = np.array(list(c.values())) / len(files)
+    tuples = []
+    print("four")
+    print(datetime.datetime.now())
+
+    for x, y in zip(keys, values):
+        if file in x:
+            if y > 0.5:
+                print(1)
+            elif 0.4 < y <= 0.5:
+                print(0.5)
+            elif y <= 0.4:
+                print(0)
+        tuples.append((y, x))
+
+    if file not in keys:
+        print(0)
+
+    tuples.sort()
+    print(tuples)
+    return tuples
 
 
 if __name__ == '__main__':
