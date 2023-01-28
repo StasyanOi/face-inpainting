@@ -1,6 +1,6 @@
 # face-inpainting
 
-This project proves functionality to train and use a system of neural nets to inpaint faces
+This project provides functionality to train and use a system of neural networks (GANN) to inpaint faces.
 
 To set up the environment run setup.sh
 
